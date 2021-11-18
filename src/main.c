@@ -1,10 +1,7 @@
 #include "../inc/ush.h"
 
-void mx_ush_init(t_cmd_utils** utils) {
+void mx_env_reset(t_cmd_utils** utils) {
 
-    (*utils)->cmd = NULL;
-    (*utils)->args = NULL;
-    
     int i = 0;
     for (; environ[i] != NULL; ++i) {
 
@@ -12,6 +9,15 @@ void mx_ush_init(t_cmd_utils** utils) {
 
     }
     (*utils)->env_vars[i] = NULL;
+    
+}
+
+void mx_ush_init(t_cmd_utils** utils) {
+
+    (*utils)->cmd = NULL;
+    (*utils)->args = NULL;
+    
+    mx_env_reset(utils);
     
 }
 
@@ -24,9 +30,12 @@ int main() {
 
     while (1) {
 
+        printf("u$h> ");
         char* line = mx_read_line();
         utils->cmd = mx_strdup(line);
         mx_strdel(&line);
+        utils->args = malloc(sizeof(char));
+        utils->args[0] = "test";
 
         status = mx_exec(utils);
 
