@@ -32,10 +32,9 @@ int main() {
 
         printf("u$h> ");
         char* line = mx_read_line();
+        parse_line(utils, line);
         utils->cmd = mx_strdup(line);
         mx_strdel(&line);
-        utils->args = malloc(sizeof(char));
-        utils->args[0] = "test";
 
         status = mx_exec(utils);
 
@@ -43,6 +42,6 @@ int main() {
 
     }
 
-    return status; 
+    mx_exit(utils);
 
 }
