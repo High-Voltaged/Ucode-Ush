@@ -5,7 +5,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <fcntl.h>
-#include <malloc/malloc.h>
+#ifdef __MACH__
+    #include <malloc/malloc.h>
+#else
+    #include <malloc.h>
+#endif
 
 typedef struct s_list
 {
@@ -73,7 +77,7 @@ char **mx_strsplit(char const *s, char c);
 char *mx_strjoin(char const *s1, char const *s2);
 char *mx_file_to_str(const char *file);
 char *mx_replace_substr(const char *str, const char *sub, const char *replace);
-int mx_read_line(char **lineptr, size_t buf_size, char delim, const int fd);
+// int mx_read_line(char **lineptr, size_t buf_size, char delim, const int fd);
 
 //memory pack
 void *mx_memset(void *b, int c, size_t len);
