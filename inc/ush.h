@@ -11,7 +11,6 @@
 extern char** environ;
 
 typedef struct s_cmd_utils {
-    char* cmd;          // parsed command
     char** args;        // arguments for the command 
     char* env_vars[100]; // saved enviroment variables
     // int status;
@@ -28,7 +27,7 @@ typedef struct s_cd_flags {
 
 // PARSING
 char* mx_read_line();
-void parse_line(t_cmd_utils *utils, char *line);
+void mx_parse_line(t_cmd_utils *utils, char *line);
 
 // COMMAND EXECUTION
 int mx_exec(t_cmd_utils* utils);

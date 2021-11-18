@@ -2,7 +2,7 @@
 
 bool mx_is_flag_found(char* flags, char flag) {
 
-    for (size_t i = 0; i < sizeof(flags) / sizeof(flags[0]); ++i) {
+    for (int i = 0; i < mx_strlen(flags); ++i) {
 
         if (flag == flags[i])
             return true;

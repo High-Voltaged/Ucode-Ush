@@ -51,7 +51,7 @@ void mx_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
                     mx_printerr("invalid option -- ");
                     mx_printerr(arg);
                     mx_printerr("\n");
-                    exit(1);
+                    // exit(1);
                 }
             
             }
@@ -75,7 +75,7 @@ int cd_prev(t_cmd_utils** utils) {
     // mx_strdel(&prev_wd);
     mx_strdel(&cwd);
     mx_env_reset(utils);
-    return 1;
+    return 0;
 
 }
 
@@ -96,7 +96,7 @@ int cd_home(t_cmd_utils* utils) {
     // mx_strdel(&home);
     mx_strdel(&cwd);
     mx_env_reset(&utils);
-    return 1;
+    return 0;
 
 }
 
@@ -118,7 +118,7 @@ int mx_cd(t_cmd_utils* utils) {
             setenv("OLDPWD", cwd, 1);
             if (chdir(utils->args[0]) == -1) {
                 perror("chdir");
-                exit(1);
+                return 1;
             }
             mx_strdel(&cwd);
             cwd = malloc(sizeof(char) * PATH_MAX);
@@ -127,7 +127,7 @@ int mx_cd(t_cmd_utils* utils) {
             mx_strdel(&cwd);
             mx_env_reset(&utils);
 
-            return 1;
+            return 0;
 
         }
 

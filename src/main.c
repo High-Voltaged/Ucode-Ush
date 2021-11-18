@@ -14,7 +14,6 @@ void mx_env_reset(t_cmd_utils** utils) {
 
 void mx_ush_init(t_cmd_utils** utils) {
 
-    (*utils)->cmd = NULL;
     (*utils)->args = NULL;
     
     mx_env_reset(utils);
@@ -32,13 +31,10 @@ int main() {
 
         printf("u$h> ");
         char* line = mx_read_line();
-        parse_line(utils, line);
-        utils->cmd = mx_strdup(line);
+        mx_parse_line(utils, line);
         mx_strdel(&line);
 
         status = mx_exec(utils);
-
-        mx_strdel(&utils->cmd);
 
     }
 
