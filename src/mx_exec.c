@@ -30,7 +30,7 @@ int mx_exec(t_cmd_utils* utils) {
     }
     if (pid == 0) {
 
-        if (execve("/bin/rm", NULL, utils->env_vars) == -1) {
+        if (execvp(utils->cmd, utils->args) == -1) {
 
             perror(utils->cmd);
             exit(1);

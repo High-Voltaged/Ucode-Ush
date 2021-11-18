@@ -79,36 +79,36 @@ void parse_line(t_cmd_utils *utils, char *line)
 
 }
 
-int main() {
+// int main() {
 
-    int status = 0;
-    t_cmd_utils* utils = malloc(sizeof(*utils));
-    mx_ush_init(&utils);
+//     int status = 0;
+//     t_cmd_utils* utils = malloc(sizeof(*utils));
+//     mx_ush_init(&utils);
 
 
-    while (1) {
+//     while (1) {
 
-        printf("u$h> ");
-        char* line = mx_read_line();
-        // utils->cmd = mx_strdup(line);
+//         printf("u$h> ");
+//         char* line = mx_read_line();
+//         // utils->cmd = mx_strdup(line);
 
-        parse_line(utils, line);
+//         parse_line(utils, line);
 
-        printf("name: %s; ", utils->cmd);
-        for (int i = 0; utils->args[i] != NULL; i++)
-        {
-            printf("%s, ", utils->args[i]);
-        }
-        printf("\n");
+//         printf("name: %s; ", utils->cmd);
+//         for (int i = 0; utils->args[i] != NULL; i++)
+//         {
+//             printf("%s, ", utils->args[i]);
+//         }
+//         printf("\n");
         
-        mx_strdel(&line);
+//         mx_strdel(&line);
 
-        // status = mx_exec(utils);
+//         // status = mx_exec(utils);
 
-        mx_strdel(&utils->cmd);
+//         mx_strdel(&utils->cmd);
 
-    }
+//     }
 
-    return status; 
+//     return status; 
 
-}
+// }

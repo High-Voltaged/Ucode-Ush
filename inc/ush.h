@@ -26,15 +26,18 @@ typedef struct s_cd_flags {
 }              t_cd_flags;
 
 
-// 
+// PARSING
 char* mx_read_line();
+void parse_line(t_cmd_utils *utils, char *line);
+
+// COMMAND EXECUTION
 int mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
+// MISC UTILS
 void mx_env_reset(t_cmd_utils** utils);
-
 bool mx_is_flag_found(char flags[], char flag);
 
 // Array of function pointers for commands
