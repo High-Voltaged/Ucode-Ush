@@ -24,15 +24,32 @@ static char* get_dir_path(char* dir, const char* file_name) {
 
 }
 
+static bool is_builtin_cmd(const char* cmd) {
+
+    for (int i = 0; builtin_cmds[i] != NULL; ++i) {
+
+        if (mx_strcmp(cmd, builtin_cmds[i]) == 0) {
+            return true;
+        }
+
+    }
+    return false;
+
+}
+
 int mx_which(t_cmd_utils* utils, char* to_find) {
 
     if (to_find == NULL || mx_strcmp(to_find, "") == 0)
         return 0;
 
+    if (is_builtin_cmd(to_find)) {
+        mx_printerr(to_find);
+        mx_printerr(BUILTIN_CMD_ERR);
+        return 0;
+    }
+
     t_wch_flags* flags = malloc(sizeof(*flags));
-    // mx_wch_parse_flags(&flags, utils);
-    flags->a = 1;
-    flags->s = 0;
+    mx_wch_parse_flags(&flags, utils);
 
     int path_count = 2;
     char** paths = malloc(sizeof(*paths) * path_count);
@@ -70,8 +87,14 @@ int mx_which(t_cmd_utils* utils, char* to_find) {
         closedir(curr_dir);
 
     }
+
+    if (paths[0] == NULL) {
+        mx_printerr("command not found\n");
+    } else {
+        mx_print_strarr(paths, "\n");
+    }
+
     mx_del_strarr(&dirs);
-    mx_print_strarr(paths, "\n");
     mx_del_strarr(&paths);
     free(flags);
 

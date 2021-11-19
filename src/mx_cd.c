@@ -84,7 +84,7 @@ int mx_cd(t_cmd_utils* utils) {
     mx_cd_parse_flags(&flags, utils);
 
     char* dir_str = NULL;
-    char* phys_dir = NULL;
+    // char* phys_dir = NULL;
     if (flags->P)  {
         dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup("");
     } else {

@@ -15,5 +15,6 @@ static const char* HOME_STR = "HOME";
 static const char* PATH_STR = "PATH";
 
 static const char* USH_STR = "ush: ";
+static const char* BUILTIN_CMD_ERR = ": shell built-in command\n";
 
 #endif
