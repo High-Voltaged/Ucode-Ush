@@ -2,6 +2,12 @@
 
 int mx_builtin_exec(t_cmd_utils* utils) {
 
+    if (mx_strcmp(utils->args[0], WHICH_STR) == 0) {
+        char* arg = utils->args[2] == NULL || mx_strcmp(utils->args[2], "") ? utils->args[2] : utils->args[1];
+        mx_which(utils, arg);
+        return 0;
+    }
+
     for (int i = 0; builtin_cmds[i] != NULL; ++i) {
 
         if (mx_strcmp(utils->args[0], builtin_cmds[i]) == 0) {
@@ -29,7 +35,7 @@ int mx_exec(t_cmd_utils* utils) {
     }
     if (pid == 0) {
         
-        if (execvpe(utils->args[0], utils->args, utils->env_vars) == -1) {
+        if (execvp(utils->args[0], utils->args) == -1) {
             
             perror(utils->args[0]);
             return 1;
