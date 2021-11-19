@@ -4,6 +4,7 @@
 #include "../libmx/inc/libmx.h"
 #include "const.h"
 #include <sys/types.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -25,18 +26,34 @@ typedef struct s_cd_flags {
     int s, P, prev;
 }              t_cd_flags;
 
+typedef struct s_which_flags {
+    int s, a;
+}              t_wch_flags;
+
 
 // PARSING
+
 char* mx_read_line();
 void mx_parse_line(t_cmd_utils *utils, char *line);
+void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
+void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
+void mx_cd_add_flag(t_cd_flags** flags, char flag);
+void mx_wch_add_flag(t_wch_flags** flags, char flag);
 
 // COMMAND EXECUTION
+
 int mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
+int mx_which(t_cmd_utils* utils, char* to_find);
 int mx_exit(t_cmd_utils* utils);
 
+// ERROR HANDLING
+
+void mx_print_flag_err(char flag);
+
 // MISC UTILS
+
 void mx_env_reset(t_cmd_utils** utils);
 bool mx_is_flag_found(char flags[], char flag);
 

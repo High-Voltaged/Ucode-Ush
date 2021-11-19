@@ -7,7 +7,13 @@ static const char* builtin_cmds[] = {
     "cd", "env", "exit", NULL
 };
 
-// static const char* CD_STR = "cd";
-// static const char* ENV_STR = "env";
+static const char* WHICH_STR = "which";
+
+static const char* OLDPWD_STR = "OLDPWD";
+static const char* PWD_STR = "PWD";
+static const char* HOME_STR = "HOME";
+static const char* PATH_STR = "PATH";
+
+static const char* USH_STR = "ush: ";
 
 #endif

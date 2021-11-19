@@ -16,7 +16,7 @@ all: $(LIB) $(USH)
 
 $(USH):
 	mkdir $(OBJDIR)
-	$(CC) $(CFLAGS) -c $(SRC)
+	$(CC) $(CFLAGS) -g -c $(SRC)
 	mv *.o $(OBJDIR)
 	$(CC) -o $(USH) $(OBJS) -L$(LIB_DIR) $(LIB_NAME)
 
