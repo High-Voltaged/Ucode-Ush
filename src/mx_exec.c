@@ -3,8 +3,7 @@
 int mx_builtin_exec(t_cmd_utils* utils) {
 
     if (mx_strcmp(utils->args[0], WHICH_STR) == 0) {
-        char* arg = utils->args[2] == NULL || mx_strcmp(utils->args[2], "") ? utils->args[2] : utils->args[1];
-        mx_which(utils, arg);
+        mx_which(utils, utils->args[2] ? utils->args[2] : utils->args[1]);
         return 0;
     }
 
