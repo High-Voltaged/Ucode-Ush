@@ -1,6 +1,6 @@
 CC = clang
-# CFLAGS = -std=gnu11 -Wall -Wextra -Werror -Wpedantic
-# CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
+# CFLAGS = -std=gnu11 -Wall -Wextra -Werror -Wpedantic -g
+CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 
 OBJDIR = obj
 SRCDIR = src
@@ -16,7 +16,7 @@ all: $(LIB) $(USH)
 
 $(USH):
 	mkdir $(OBJDIR)
-	$(CC) $(CFLAGS) -g -c $(SRC)
+	$(CC) $(CFLAGS) -c $(SRC)
 	mv *.o $(OBJDIR)
 	$(CC) -o $(USH) $(OBJS) -L$(LIB_DIR) $(LIB_NAME)
 

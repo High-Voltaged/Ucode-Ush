@@ -46,6 +46,7 @@ int mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
 int mx_which(t_cmd_utils* utils, char* to_find);
+int mx_pwd(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
 // ERROR HANDLING
@@ -59,7 +60,7 @@ bool mx_is_flag_found(char flags[], char flag);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
-    &mx_cd, &mx_env, &mx_exit, NULL 
+    &mx_cd, &mx_env, &mx_pwd, &mx_exit, NULL 
 };
 
 #endif
