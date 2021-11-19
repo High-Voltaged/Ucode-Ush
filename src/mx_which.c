@@ -89,7 +89,8 @@ int mx_which(t_cmd_utils* utils, char* to_find) {
     }
 
     if (paths[0] == NULL) {
-        mx_printerr("command not found\n");
+        mx_printerr(to_find);
+        mx_printerr(" not found\n");
     } else {
         mx_print_strarr(paths, "\n");
     }
