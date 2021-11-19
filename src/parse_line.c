@@ -2,19 +2,21 @@
 
 void mx_parse_line(t_cmd_utils *utils, char *line)
 {
+    char *mod_line = mx_del_extra_spaces(line);
+
     //for line with only func name without args
-    if ((mx_count_words(line, ' ') - mx_count_substr(line, "\\ ")) <= 1)
+    if ((mx_count_words(mod_line, ' ') - mx_count_substr(mod_line, "\\ ")) <= 1)
     {
         utils->args = malloc(2 * sizeof(char*));
-        utils->args[0] = mx_strndup(line, mx_strlen(line) - 1);
+        utils->args[0] = mx_strndup(mod_line, mx_strlen(mod_line));
         utils->args[1] = NULL;
         return;
     }
-    
-    int args_len = mx_count_words(line, ' ') - mx_count_substr(line, "\\ ");
-    utils->args = malloc((args_len) * sizeof(char*));
 
-    char *tmp = line;
+    int args_len = mx_count_words(mod_line, ' ') - mx_count_substr(mod_line, "\\ ");
+    utils->args = malloc((args_len + 1) * sizeof(char*));
+
+    char *tmp = mod_line;
     int i;
 
     for (i = 0; i < args_len - 1; i++)
@@ -30,13 +32,19 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
             back_slash_index = mx_get_substr_index(tmp, "\\ ");
         }
 
-        tmp += mx_get_char_index(tmp, ' ') + 1;
-        utils->args[i] = mx_strndup(line, mx_get_substr_index(line, tmp) - 1);
-        line += mx_get_substr_index(line, tmp);         
+        tmp += space_index + 1;
+        utils->args[i] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp) - 1);
+        mod_line = tmp;
     }
 
-    //save last elem of line without '\n'
-    utils->args[i++] = mx_strndup(line, mx_strlen(line) - 1);
+    //save last elem of mod_line without '\n'
+    utils->args[i] = mx_strndup(mod_line, mx_strlen(mod_line));
 
-    utils->args[i] = NULL;
+    utils->args[args_len] = NULL;
+
+    for (int i = 0; utils->args[i] != NULL; i++)
+    {
+        utils->args[i] = mx_replace_substr(utils->args[i], "\\ ", " ");
+    }
+    
 }
