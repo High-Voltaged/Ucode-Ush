@@ -29,12 +29,12 @@ static void flag_init(t_cd_flags* flags, int count) {
 
 void mx_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
 
-    char* const_flags = "sP";
     flag_init(*flags, 3);
 
     if (utils->args == NULL) return;
 
-    for (int i = 0; utils->args[i] != NULL; ++i) {
+    char* const_flags = "sP";
+    for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
         if (arg[0] == '-' && mx_strlen(arg) == 1) {
@@ -55,8 +55,28 @@ void mx_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
                 }
             
             }
-        }
+
+        } else break;
     }
+
+}
+
+char* get_linked_dir(const char* dir_path) {
+
+    struct stat stat;
+    lstat(dir_path, &stat);
+
+    char* result = mx_strnew(stat.st_size);
+    int bytes = readlink(dir_path, result, stat.st_size + 1);
+
+    if (bytes == -1) {
+        mx_strdel(&result);
+        return NULL;
+    }
+    result[bytes] = '\0';
+
+    return result;
+
 }
 
 int cd_prev(t_cmd_utils** utils) {
@@ -105,10 +125,28 @@ int mx_cd(t_cmd_utils* utils) {
     t_cd_flags* flags = malloc(sizeof(*flags));
     mx_parse_flags(&flags, utils);
 
-    if (utils->args != NULL) {
+    char* dir_str = NULL;
+    char* phys_dir = NULL;
+    if (flags->P)  {
+        dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup("");
+    } else {
+        dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : mx_strdup("");
+    }
+    
+    // if (flags->P && (phys_dir = get_linked_dir(dir_str)) != NULL) {
+    //     mx_strdel(&dir_str);
+    //     dir_str = mx_strdup(phys_dir);
+    //     mx_strdel(&phys_dir);
+    // }
+    
+    printf("dir_str -- %s\n", dir_str);
+
+    if (mx_strcmp(dir_str, "") != 0) {
 
         if (flags->prev) {
 
+            mx_strdel(&dir_str);
+            free(flags);
             return cd_prev(&utils);
             
         } else {
@@ -116,23 +154,27 @@ int mx_cd(t_cmd_utils* utils) {
             char* cwd = malloc(sizeof(char) * PATH_MAX);
             cwd = getcwd(cwd, PATH_MAX);
             setenv("OLDPWD", cwd, 1);
-            if (chdir(utils->args[0]) == -1) {
+            if (chdir(dir_str) == -1) {
                 perror("chdir");
-                return 1;
+                return 0;
             }
             mx_strdel(&cwd);
             cwd = malloc(sizeof(char) * PATH_MAX);
             getcwd(cwd, PATH_MAX);
             setenv("PWD", cwd, 1);
+            
             mx_strdel(&cwd);
+            mx_strdel(&dir_str);
+            free(flags);
             mx_env_reset(&utils);
-
             return 0;
 
         }
 
     } else {
 
+        mx_strdel(&dir_str);
+        free(flags);
         return cd_home(utils);
 
     }

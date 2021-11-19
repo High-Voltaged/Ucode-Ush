@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=gnu11 -Wall -Wextra -Werror -Wpedantic
+# CFLAGS = -std=gnu11 -Wall -Wextra -Werror -Wpedantic
 # CFLAGS = -std=c11 -Wall -Wextra -Werror -Wpedantic
 
 OBJDIR = obj

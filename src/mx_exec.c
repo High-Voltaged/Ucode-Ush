@@ -29,10 +29,11 @@ int mx_exec(t_cmd_utils* utils) {
     }
     if (pid == 0) {
         
-        if (execvp(utils->args[0], utils->args) == -1) {
+        if (execvpe(utils->args[0], utils->args, utils->env_vars) == -1) {
             
             perror(utils->args[0]);
-            exit(1);
+            return 1;
+            // exit(1);
 
         }
         return 0;
