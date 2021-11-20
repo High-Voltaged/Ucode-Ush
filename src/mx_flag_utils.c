@@ -12,6 +12,29 @@ bool mx_is_flag_found(char* flags, char flag) {
 
 }
 
+static bool is_only_flags(char* flags, char* flags_str) {
+
+    bool is_flag;
+    for (int i = 1; i < mx_strlen(flags_str); i++) {
+        is_flag = false;
+
+        for (int j = 0; j < mx_strlen(flags); j++) {
+
+            if (flags_str[i] == flags[j]) {
+                is_flag = true;
+                break;
+            }
+        }
+
+        if (!is_flag)
+        {
+            return false;
+        }
+        
+    }
+    return true;
+}
+
 void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
 
     (*flags)->P = (*flags)->prev = (*flags)->s = 0;
@@ -111,26 +134,23 @@ void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
 void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count) {
 
-    (*flags)->n = (*flags)->e = 0;
-    (*flags)->E = 1; //default
+    (*flags)->n = (*flags)->E = 0;
+    (*flags)->e = 1;
+    // (*flags)->E = 1; //default
 
     if (utils->args == NULL) return;
 
-    char* const_flags = "neE";
+    char* const_flags = "neE"; //const
     for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
         if ((arg[0] == '-') && mx_isalpha(arg[1])) {
 
-            for (int j = 1; arg[j] != '\0'; j++) {
-
-                if (mx_is_flag_found(const_flags, arg[j])) {
-                    mx_echo_add_flag(flags, arg[j]);
-                } else {
-                    return;
-                }
+            if (!is_only_flags(const_flags, arg))
+                return;
             
-            }
+            for (int j = 1; arg[j] != '\0'; j++)
+                mx_echo_add_flag(flags, arg[j]);
 
         } else return;
 
