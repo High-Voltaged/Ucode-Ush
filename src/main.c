@@ -30,4 +30,4 @@ int main() {
 
 }
 
-// Don't count empty string as an argument (during parsing)
+// make prompt go on a newline, if there was none before

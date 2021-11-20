@@ -44,7 +44,7 @@ char* mx_read_line();
 void mx_parse_line(t_cmd_utils *utils, char *line);
 void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
 void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
-void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils);
+void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx);
 void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
@@ -68,6 +68,8 @@ void mx_print_env_error(char flag);
 
 // MISC UTILS
 
+char* get_dir_path(char* dir, const char* file_name);
+void mx_environ_reset(t_cmd_utils* utils);
 void mx_env_reset(t_cmd_utils** utils);
 void mx_clear_env_vars(t_cmd_utils** utils);
 bool mx_is_flag_found(char flags[], char flag);
