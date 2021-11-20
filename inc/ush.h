@@ -34,6 +34,10 @@ typedef struct s_env_flags {
     int i, P, u;
 }              t_env_flags;
 
+typedef struct s_echo_flags {
+    int n, e, E;
+}              t_echo_flags;
+
 // PARSING
 
 char* mx_read_line();
@@ -41,15 +45,18 @@ void mx_parse_line(t_cmd_utils *utils, char *line);
 void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
 void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
 void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils);
+void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
 void mx_env_add_flag(t_env_flags** flags, char flag);
+void mx_echo_add_flag(t_echo_flags** flags, char flag);
 
 // COMMAND EXECUTION
 
 int mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
+int mx_echo(t_cmd_utils* utils);
 int mx_which(t_cmd_utils* utils, char* to_find);
 int mx_pwd(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
@@ -67,7 +74,7 @@ bool mx_is_flag_found(char flags[], char flag);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
-    &mx_cd, &mx_env, &mx_pwd, &mx_exit, NULL 
+    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_exit, NULL 
 };
 
 #endif
