@@ -30,6 +30,9 @@ typedef struct s_which_flags {
     int s, a;
 }              t_wch_flags;
 
+typedef struct s_env_flags {
+    int i, P, u;
+}              t_env_flags;
 
 // PARSING
 
@@ -37,8 +40,10 @@ char* mx_read_line();
 void mx_parse_line(t_cmd_utils *utils, char *line);
 void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
 void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
+void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
+void mx_env_add_flag(t_env_flags** flags, char flag);
 
 // COMMAND EXECUTION
 
@@ -52,10 +57,12 @@ int mx_exit(t_cmd_utils* utils);
 // ERROR HANDLING
 
 void mx_print_flag_err(char flag);
+void mx_print_env_error(char flag);
 
 // MISC UTILS
 
 void mx_env_reset(t_cmd_utils** utils);
+void mx_clear_env_vars(t_cmd_utils** utils);
 bool mx_is_flag_found(char flags[], char flag);
 
 // Array of function pointers for commands

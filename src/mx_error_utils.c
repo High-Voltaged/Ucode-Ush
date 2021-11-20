@@ -15,3 +15,11 @@ void mx_print_flag_err(char flag) {
     // mx_printerr();
 
 }
+
+void mx_print_env_error(char flag) {
+
+    mx_printerr(ENV_ARG_ERR);
+    print_err_char(flag);
+    mx_printerr("'\n");
+
+}

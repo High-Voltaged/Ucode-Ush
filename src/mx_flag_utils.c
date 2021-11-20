@@ -71,3 +71,37 @@ void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
     }
 
 }
+
+void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils) {
+
+    (*flags)->i = (*flags)->P = (*flags)->u = 0;
+
+    if (utils->args == NULL) return;
+
+    char* const_flags = "iPu";
+    for (int i = 1; utils->args[i] != NULL; ++i) {
+
+        char* arg = utils->args[i];
+        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+
+            for (int j = 1; arg[j] != '\0'; j++) {
+
+                if (mx_is_flag_found(const_flags, arg[j])) {
+                    
+                    if ((arg[j] == 'u' || arg[j] == 'P') && utils->args[i + 1] == NULL) {
+                        mx_print_env_error(arg[j]);
+                        continue; // possibly not continue
+                    }
+                    
+                    mx_env_add_flag(flags, arg[j]);
+                } else {
+                    mx_print_flag_err(arg[j]);
+                    // exit(1);
+                }
+            
+            }
+
+        } else break;
+    }
+
+}
