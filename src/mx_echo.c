@@ -24,6 +24,63 @@ void mx_echo_add_flag(t_echo_flags** flags, char flag) {
 
 }
 
+int octal_to_decimal(int n)
+{
+    int num = n;
+    int dec_value = 0;
+ 
+    // Initializing base value to 1, i.e 8^0
+    int base = 1;
+ 
+    int temp = num;
+    while (temp) {
+ 
+        // Extracting last digit
+        int last_digit = temp % 10;
+        temp = temp / 10;
+ 
+        // Multiplying last digit with appropriate
+        // base value and adding it to dec_value
+        dec_value += last_digit * base;
+ 
+        base = base * 8;
+    }
+ 
+    return dec_value;
+}
+
+void print_oct(char *str, int *letter_count)
+{
+    int oct_len = 0;
+    while (mx_isdigit(str[oct_len]) && (oct_len < 4) && (str[oct_len] != '\0'))
+    {
+        oct_len++;
+        (*letter_count)++;
+    }
+    
+    if (!oct_len)
+    {
+        return;
+    }
+    
+    char *oct = mx_strndup(str, oct_len);
+
+    int dec = octal_to_decimal(mx_atoi(oct));
+    mx_printchar(dec);
+
+    mx_strdel(&oct);
+}
+
+void print_hex(char *str)
+{
+    // printf("%s\n", str);
+    char *hex = mx_strndup(str, 2);
+    int dec = mx_hex_to_nbr(hex);
+    // printf("%s, %d\n", hex, dec);
+    mx_printchar(dec);
+    mx_strdel(&hex);
+}
+
 void print_bec(char *str, int *letter_count) {
         // wchar_t c = L'\U0001f602';
 
@@ -59,7 +116,7 @@ void print_bec(char *str, int *letter_count) {
         mx_printchar('\n');
         (*letter_count) += 2;
         break;
-    
+
     case 't':
         mx_printchar('\t');
         (*letter_count) += 2;
@@ -69,6 +126,33 @@ void print_bec(char *str, int *letter_count) {
         mx_printchar('\v');
         (*letter_count) += 2;
         break;
+
+    case '0':
+        if (mx_isdigit(str[3]))
+        {
+            print_oct(str + 3, letter_count);
+            (*letter_count) += 2;
+            break;   
+        }
+        else {
+            mx_printchar('\\');
+            (*letter_count) += 1;
+            break;
+        }
+
+    case 'x':
+        // mx_printchar('\x23');
+        if (mx_isalpha(str[3]) || mx_isdigit(str[3]))
+        {
+            print_hex(str + 3);
+            (*letter_count) += 4;//fix? is always hex number length is equal to 2?
+            break;   
+        }
+        else {
+            mx_printchar('\\');
+            (*letter_count) += 1;
+            break;
+        }
     
     default:
         mx_printchar('\\');
