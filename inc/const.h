@@ -4,7 +4,7 @@
 #define PATH_MAX 4096
 
 static const char* builtin_cmds[] = {
-    "cd", "env", "echo", "pwd", "exit", NULL
+    "cd", "env", "echo", "pwd", "exit", "which", NULL
 };
 
 static const char* WHICH_STR = "which";

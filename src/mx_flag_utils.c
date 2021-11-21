@@ -124,10 +124,9 @@ void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
             
             }
 
-        } else {
-            *arg_idx = i;
-            break;
-        }
+        } else break;
+        ++(*arg_idx);
+    
     }
 
 }

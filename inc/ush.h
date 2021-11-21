@@ -57,7 +57,7 @@ int mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
 int mx_echo(t_cmd_utils* utils);
-int mx_which(t_cmd_utils* utils, char* to_find);
+int mx_which(t_cmd_utils* utils, const char* to_find);
 int mx_pwd(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
@@ -68,6 +68,7 @@ void mx_print_env_error(char flag);
 
 // MISC UTILS
 
+char** mx_get_exec_paths(const char* to_find, bool single_search);
 char* get_dir_path(char* dir, const char* file_name);
 void mx_environ_reset(t_cmd_utils* utils);
 void mx_env_reset(t_cmd_utils** utils);
