@@ -25,6 +25,7 @@ bool mx_isupper(int c);
 int mx_tolower(int c);
 int mx_toupper(int c);
 int mx_atoi(const char *str);
+int mx_octal_to_decimal(int n);
 void mx_printerr(const char *s);
 char* mx_str_tolower(char* str);
 
