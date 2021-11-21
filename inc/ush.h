@@ -68,7 +68,10 @@ void mx_print_env_error(char flag);
 
 // MISC UTILS
 
-char** mx_get_exec_paths(const char* to_find, bool single_search);
+char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
+int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_arg_idx, const char* custom_path);
+char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
+void mx_print_env_vars(t_cmd_utils* utils);
 char* get_dir_path(char* dir, const char* file_name);
 void mx_environ_reset(t_cmd_utils* utils);
 void mx_env_reset(t_cmd_utils** utils);

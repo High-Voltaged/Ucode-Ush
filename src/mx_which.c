@@ -51,7 +51,7 @@ int mx_which(t_cmd_utils* utils, const char* to_find) {
     t_wch_flags* flags = malloc(sizeof(*flags));
     mx_wch_parse_flags(&flags, utils);
 
-    char** paths = mx_get_exec_paths(to_find, !flags->a);
+    char** paths = mx_get_exec_paths(to_find, NULL, !flags->a);
 
     if (paths[0] == NULL) {
         mx_printerr(to_find);

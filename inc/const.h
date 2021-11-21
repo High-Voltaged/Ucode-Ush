@@ -14,6 +14,7 @@ static const char* PWD_STR = "PWD";
 static const char* HOME_STR = "HOME";
 static const char* PATH_STR = "PATH";
 
+static const char* PROMPT_STR = "u$h> ";
 static const char* USH_STR = "ush: ";
 static const char* BUILTIN_CMD_ERR = ": shell built-in command\n";
 static const char* ENV_ARG_ERR = "env: option requires an argument -- '";

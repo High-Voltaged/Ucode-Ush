@@ -3,7 +3,6 @@
 void mx_ush_init(t_cmd_utils** utils) {
 
     (*utils)->args = NULL;
-    
     mx_env_reset(utils);
     
 }
@@ -14,10 +13,9 @@ int main() {
     t_cmd_utils* utils = malloc(sizeof(*utils));
     mx_ush_init(&utils);
 
-
     while (1) {
 
-        printf("u$h> ");
+        printf("%s", PROMPT_STR);
         char* line = mx_read_line();
         mx_parse_line(utils, line);
         mx_strdel(&line);
@@ -31,3 +29,4 @@ int main() {
 }
 
 // make prompt go on a newline, if there was none before
+// change which -a to handle error + normal output
