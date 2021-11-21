@@ -52,7 +52,7 @@ int octal_to_decimal(int n)
 void print_oct(char *str, int *letter_count)
 {
     int oct_len = 0;
-    while (mx_isdigit(str[oct_len]) && (oct_len < 4) && (str[oct_len] != '\0'))
+    while (mx_isdigit(str[oct_len]) && (oct_len <= 3) && (str[oct_len] != '\0')) // 3 is a max len of oct num in our shell
     {
         oct_len++;
         (*letter_count)++;
@@ -73,19 +73,29 @@ void print_oct(char *str, int *letter_count)
 
 void print_hex(char *str)
 {
-    // printf("%s\n", str);
     char *hex = mx_strndup(str, 2);
     int dec = mx_hex_to_nbr(hex);
-    // printf("%s, %d\n", hex, dec);
     mx_printchar(dec);
+
     mx_strdel(&hex);
 }
 
 void print_bec(char *str, int *letter_count) {
         // wchar_t c = L'\U0001f602';
-
+    if (str[2] == '\\' && str[3] != '\\' )
+    {
+        return;
+    }
+    else if (str[2] == '\\' && str[3] == '\\' )
+    {
+        mx_printchar('\\');
+        (*letter_count) += 3;
+        return;
+    }
+    
     switch (str[2])
     {
+    
     case 'a':
         mx_printchar('\a');
         (*letter_count) += 2;
@@ -154,6 +164,11 @@ void print_bec(char *str, int *letter_count) {
             break;
         }
     
+    // case '\\':
+    //     mx_printchar('\\');
+    //     (*letter_count) += 2;
+    //     break;
+    
     default:
         mx_printchar('\\');
         (*letter_count) += 1;
@@ -166,11 +181,12 @@ void out_echo_e(char *str)
 {
     for (int i = 0; i < mx_strlen(str); i++)
     {
-        if (str[i] == '\\' && str[i + 1] != '\\')
-        {
-            continue;
-        }
-        else if (str[i] == '\\' && str[i + 1] == '\\')
+        // if (str[i] == '\\' && str[i + 1] != '\\')
+        // {
+        //     continue;
+        // }
+        // else 
+        if (str[i] == '\\' && str[i + 1] == '\\')
         {
             print_bec(str + i, &i);
         }
