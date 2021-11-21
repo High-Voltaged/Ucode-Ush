@@ -42,28 +42,25 @@ static void set_env_vars(t_cmd_utils* utils, int* arg_idx) {
             setenv(var_name, var_value, 1);
             mx_strdel(&var_name);
 
-        } else {
-            *arg_idx = i;
-            break;
-        }
+        } else break;
+        ++(*arg_idx);
 
     }
-    mx_env_reset(&utils);
-    // print_env_vars(utils);
 
 }
 
-static void unset_env_var(t_cmd_utils** utils) {
+static void unset_env_var(t_cmd_utils** utils, int* arg_idx) {
 
-    if (mx_strchr((*utils)->args[2], '=') != NULL) {
+    if (mx_strchr((*utils)->args[*arg_idx], '=') != NULL) {
         mx_printerr(ENV_UNSET_ERR);
-        mx_printerr((*utils)->args[2]);
+        mx_printerr((*utils)->args[*arg_idx]);
         mx_printerr(ENV_INVARG_ERR);
         return;
     }
 
-    unsetenv((*utils)->args[2]);
+    unsetenv((*utils)->args[*arg_idx]);
     mx_env_reset(utils);
+    ++(*arg_idx);
     // print_env_vars((*utils));
 
 }
@@ -85,47 +82,11 @@ char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx) {
 
 }
 
-char* mx_get_exec_paths(const char* to_find) {
-
-    char* path = NULL;
-    DIR* curr_dir = NULL;
-    struct dirent* dp = NULL; 
-    char** dirs = mx_strsplit(getenv(PATH_STR), ':');
-    int is_found = 0;
-    for (int i = 0; !is_found && dirs[i] != NULL; ++i) {
-
-        if ((curr_dir = opendir(dirs[i])) == NULL) 
-            continue;
-
-        while ((dp = readdir(curr_dir)) != NULL) {
-
-            if (mx_strcmp(to_find, dp->d_name) == 0) {
-
-                // if (flags->a) {
-
-                //     if (paths[path_count - 2] != NULL) {
-                //         paths = mx_realloc(paths, sizeof(*paths) * (++path_count));
-                //     }
-                //     paths[path_count - 2] = get_dir_path(dirs[i], to_find);
-                //     continue;
-                
-                // }
-                path = malloc(sizeof(*path));
-                path = get_dir_path(dirs[i], to_find);
-                is_found = 1;
-                break;
-
-            }
-
-        }
-        closedir(curr_dir);
-
-    }
-    return path;
-
-}
-
 static int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_arg_idx, int flag_i_on) {
+
+    // if no utility found, return
+    if (utils->args[util_arg_idx - 1] == NULL)
+        return 0;
 
     char** util_args = mx_get_env_util_args(utils, util_arg_idx);
     pid_t pid = fork();
@@ -137,20 +98,16 @@ static int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_a
     }
     if (pid == 0) {
         
-        char* path = mx_get_exec_paths(env_util);
-        if (execve(path ? path : env_util, util_args, NULL) == -1) {
+        char** paths = mx_get_exec_paths(env_util, true);
+        if (execve(paths[0] ? paths[0] : env_util, util_args, utils->env_vars) == -1) {
             // check for the flag -i
-
-            if (flag_i_on) {
-                mx_environ_reset(utils);
-            }
 
             perror(env_util);
             return 1;
-            // exit(1);
 
         }
-        mx_strdel(&path);
+        mx_del_strarr(&paths);
+        print_env_vars(utils);
         return 0;
 
     }
@@ -163,18 +120,18 @@ static int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_a
 
 int mx_env(t_cmd_utils* utils) {
 
+    int curr_arg_idx = 1;
+    t_env_flags* flags = malloc(sizeof(*flags));
     if (utils->args[1] != NULL) {
 
-        int curr_arg_idx = 1;
-        t_env_flags* flags = malloc(sizeof(*flags));
         mx_env_parse_flags(&flags, utils, &curr_arg_idx);
 
         if (flags->u) {
-            unset_env_var(&utils);            
+            unset_env_var(&utils, &curr_arg_idx);            
         }
-        printf("here -- %d\n", curr_arg_idx);
+        
         if (flags->i) {
-         
+
             mx_clear_env_vars(&utils);
             set_env_vars(utils, &curr_arg_idx);
             exec_env_utility(utils, utils->args[curr_arg_idx], curr_arg_idx + 1, true);
@@ -183,13 +140,16 @@ int mx_env(t_cmd_utils* utils) {
         } else {
             set_env_vars(utils, &curr_arg_idx);
             exec_env_utility(utils, utils->args[curr_arg_idx], curr_arg_idx + 1, false);
+            mx_env_reset(&utils);
         }
 
-    } else {
+    } 
+    if (!flags->i || utils->args[curr_arg_idx] == NULL) {
 
         print_env_vars(utils);
     
     }
+    free(flags);
 
     return 0;
 

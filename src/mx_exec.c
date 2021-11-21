@@ -33,7 +33,6 @@ int mx_exec(t_cmd_utils* utils) {
         exit(1);
     }
     if (pid == 0) {
-        
         if (execvp(utils->args[0], utils->args) == -1) {
             
             perror(utils->args[0]);
