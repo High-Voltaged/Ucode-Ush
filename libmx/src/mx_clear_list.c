@@ -1,16 +1,19 @@
 #include "../inc/libmx.h"
 
-void mx_clear_list(t_list **list) {
+void mx_clear_list(t_list **list)
+{
+    if (list == NULL || *list == NULL)
+        return;
 
-    t_list* current = *list;
-    t_list* next = NULL;
-    while (current != NULL) {
+    t_list *node = *list;
+    t_list *next = NULL;
 
-        next = current->next;
-        free(current);
-        current = next;
-
+    while (node != NULL)
+    {
+        next = node->next;
+        free(node);
+        node = next;
     }
+    
     *list = NULL;
-
 }

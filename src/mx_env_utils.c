@@ -112,6 +112,7 @@ void mx_env_reset(t_cmd_utils** utils) {
     int i = 0;
 
     mx_clear_list(&(*utils)->env_vars);
+
     for (; environ && environ[i] != NULL; ++i) {
             
         mx_push_back(&(*utils)->env_vars, environ[i]);

@@ -3,6 +3,7 @@
 void mx_ush_init(t_cmd_utils** utils) {
 
     (*utils)->args = NULL;
+    (*utils)->env_vars = NULL;
     mx_env_reset(utils);
     
 }
