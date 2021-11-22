@@ -30,3 +30,4 @@ int main() {
 
 // make prompt go on a newline, if there was none before
 // change which -a to handle error + normal output
+// env -Pi /bin ls probably not working correctly

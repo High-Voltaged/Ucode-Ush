@@ -21,15 +21,17 @@ void mx_env_add_flag(t_env_flags** flags, char flag) {
 
 void mx_print_env_vars(t_cmd_utils* utils) {
 
-    for (int i = 0; utils->env_vars[i] != NULL; ++i) {
+    t_list* curr_var = utils->env_vars;
+    while (curr_var) {
 
-        printf("%s\n", utils->env_vars[i]);
+        printf("%s\n", curr_var->data);
+        curr_var = curr_var->next;
 
     }
 
 }
 
-static void set_env_vars(t_cmd_utils* utils, int* arg_idx) {
+void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx) {
 
     for (int i = *arg_idx; utils->args[i] != NULL; ++i) {
 
@@ -40,6 +42,7 @@ static void set_env_vars(t_cmd_utils* utils, int* arg_idx) {
             char* var_value = mx_strchr(arg, '=') + 1;
 
             setenv(var_name, var_value, 1);
+            mx_push_back(&utils->env_vars, arg);
             mx_strdel(&var_name);
 
         } else break;
@@ -55,13 +58,13 @@ static void unset_env_var(t_cmd_utils** utils, int* arg_idx) {
         mx_printerr(ENV_UNSET_ERR);
         mx_printerr((*utils)->args[*arg_idx]);
         mx_printerr(ENV_INVARG_ERR);
+        ++(*arg_idx);
         return;
     }
 
     unsetenv((*utils)->args[*arg_idx]);
-    mx_env_reset(utils);
+    mx_pop_back(&(*utils)->env_vars);
     ++(*arg_idx);
-    // mx_print_env_vars((*utils));
 
 }
 
@@ -78,21 +81,14 @@ int mx_env(t_cmd_utils* utils) {
         }
         
         const char* custom_path = flags->P ? mx_strdup(utils->args[curr_arg_idx++]) : NULL;
-        if (flags->i) {
+        if (utils->args[curr_arg_idx]) {
 
-            mx_clear_env_vars(&utils);
-            set_env_vars(utils, &curr_arg_idx);
-            exec_env_utility(utils, utils->args[curr_arg_idx], curr_arg_idx + 1, custom_path);
-            mx_env_reset(&utils);
-        
-        } else {
-            set_env_vars(utils, &curr_arg_idx);
-            exec_env_utility(utils, utils->args[curr_arg_idx], curr_arg_idx + 1, custom_path);
-            mx_env_reset(&utils);
+            if (exec_env_utility(utils, curr_arg_idx, custom_path, flags->i) != 0)
+                mx_print_env_vars(utils);
+
         }
 
-    } 
-    if ((!flags->i && !flags->P) || utils->args[curr_arg_idx] == NULL) {
+    } else {
 
         mx_print_env_vars(utils);
     

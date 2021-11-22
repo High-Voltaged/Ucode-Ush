@@ -8,13 +8,14 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 #include <stdio.h>
 
 extern char** environ;
 
 typedef struct s_cmd_utils {
     char** args;        // arguments for the command 
-    char* env_vars[100]; // saved enviroment variables
+    t_list* env_vars; // saved enviroment variables
     // int status;
 }              t_cmd_utils;
 
@@ -68,8 +69,9 @@ void mx_print_env_error(char flag);
 
 // MISC UTILS
 
+void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx);
 char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
-int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_arg_idx, const char* custom_path);
+int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_path, int flag_i_on);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
 void mx_print_env_vars(t_cmd_utils* utils);
 char* get_dir_path(char* dir, const char* file_name);
@@ -77,6 +79,8 @@ void mx_environ_reset(t_cmd_utils* utils);
 void mx_env_reset(t_cmd_utils** utils);
 void mx_clear_env_vars(t_cmd_utils** utils);
 bool mx_is_flag_found(char flags[], char flag);
+
+char** mx_get_env_array(t_cmd_utils* utils);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {

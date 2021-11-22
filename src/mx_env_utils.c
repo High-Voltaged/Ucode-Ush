@@ -19,13 +19,8 @@ char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx) {
 }
 
 // Execute the env's utility
-int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_arg_idx, const char* custom_path) {
+int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_path, int flag_i_on) {
 
-    // if no utility found, return
-    if (utils->args[util_arg_idx - 1] == NULL)
-        return 0;
-
-    char** util_args = mx_get_env_util_args(utils, util_arg_idx);
     pid_t pid = fork();
     int status = 0;
 
@@ -34,23 +29,34 @@ int exec_env_utility(t_cmd_utils* utils, const char* env_util, int util_arg_idx,
         exit(1);
     }
     if (pid == 0) {
+
+        if (flag_i_on)
+            mx_clear_list(&utils->env_vars);
+
+        mx_set_env_vars(utils, &util_arg_idx);
+
+        if (utils->args[util_arg_idx] == NULL) {
+            return 1;
+        }
         
+        char* env_util = mx_strdup(utils->args[util_arg_idx++]);
+        char** util_args = mx_get_env_util_args(utils, util_arg_idx);
         char** paths = mx_get_exec_paths(env_util, custom_path, true);
-        if (execve(paths[0] ? paths[0] : env_util, util_args, utils->env_vars) == -1) {
-            // check for the flag -i
+        char** env_var_array = mx_get_env_array(utils);
+        if (execve(paths[0] ? paths[0] : env_util, util_args, env_var_array) == -1) {
 
             perror(env_util);
-            return 1;
+            return 0;
 
         }
+        mx_strdel(&env_util);
         mx_del_strarr(&paths);
-        mx_print_env_vars(utils);
+        mx_del_strarr(&env_var_array);
+        mx_del_strarr(&util_args);
         return 0;
 
     }
     waitpid(pid, &status, 0);
-    if (util_args)
-        mx_del_strarr(&util_args);
     return 0;
 
 }
@@ -98,5 +104,36 @@ char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool sing
     }
     mx_del_strarr(&dirs);
     return paths;
+
+}
+
+void mx_env_reset(t_cmd_utils** utils) {
+
+    int i = 0;
+
+    mx_clear_list(&(*utils)->env_vars);
+    for (; environ && environ[i] != NULL; ++i) {
+            
+        mx_push_back(&(*utils)->env_vars, environ[i]);
+
+    }
+    
+
+}
+
+char** mx_get_env_array(t_cmd_utils* utils) {
+
+    char** env_array = malloc(sizeof(char*) * (mx_list_size(utils->env_vars) + 1));
+
+    int i = 0;
+    t_list* curr_var = utils->env_vars;
+    while (curr_var) {
+
+        env_array[i++] = curr_var->data;
+        curr_var = curr_var->next;
+
+    }
+    env_array[i] = NULL;
+    return env_array;
 
 }

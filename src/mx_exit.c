@@ -2,7 +2,7 @@
 
 int mx_exit(t_cmd_utils* utils) {
 
-    mx_clear_env_vars(&utils);
+    mx_clear_list(&utils->env_vars);
     
     if (utils->args) {
         for (int i = 0; utils->args[i]; ++i) {
