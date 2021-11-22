@@ -57,6 +57,7 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_pa
 
     }
     waitpid(pid, &status, 0);
+    // wait(&status);
     return 0;
 
 }
@@ -119,7 +120,6 @@ void mx_env_reset(t_cmd_utils** utils) {
 
     }
     
-
 }
 
 char** mx_get_env_array(t_cmd_utils* utils) {

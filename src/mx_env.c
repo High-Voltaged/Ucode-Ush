@@ -5,7 +5,9 @@ void mx_env_add_flag(t_env_flags** flags, char flag) {
     switch (flag) { 
 
     case 'i':
-        (*flags)->i = 1; break;
+        (*flags)->i = 1; 
+        (*flags)->P = 0; 
+        break;
 
     case 'P':
         (*flags)->P = 1; break;
@@ -80,13 +82,14 @@ int mx_env(t_cmd_utils* utils) {
             unset_env_var(&utils, &curr_arg_idx);            
         }
         
-        const char* custom_path = flags->P ? mx_strdup(utils->args[curr_arg_idx++]) : NULL;
+        char* custom_path = flags->P ? mx_strdup(utils->args[curr_arg_idx++]) : NULL;
         if (utils->args[curr_arg_idx]) {
 
             if (exec_env_utility(utils, curr_arg_idx, custom_path, flags->i) != 0)
                 mx_print_env_vars(utils);
 
         }
+        mx_strdel(&custom_path);
 
     } else {
 

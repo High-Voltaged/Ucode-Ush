@@ -16,6 +16,7 @@ extern char** environ;
 typedef struct s_cmd_utils {
     char** args;        // arguments for the command 
     t_list* env_vars; // saved enviroment variables
+    t_list* exported_vars;
     // int status;
 }              t_cmd_utils;
 
@@ -58,7 +59,7 @@ int mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
 int mx_echo(t_cmd_utils* utils);
-int mx_which(t_cmd_utils* utils, const char* to_find);
+int mx_which(t_cmd_utils* utils);
 int mx_pwd(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
@@ -84,7 +85,7 @@ char** mx_get_env_array(t_cmd_utils* utils);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
-    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_exit, NULL 
+    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_exit, NULL 
 };
 
 #endif

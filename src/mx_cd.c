@@ -84,19 +84,11 @@ int mx_cd(t_cmd_utils* utils) {
     mx_cd_parse_flags(&flags, utils);
 
     char* dir_str = NULL;
-    // char* phys_dir = NULL;
     if (flags->P)  {
         dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup("");
     } else {
         dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : mx_strdup("");
     }
-    
-    // if (flags->P && (phys_dir = get_linked_dir(dir_str)) != NULL) {
-    //     mx_strdel(&dir_str);
-    //     dir_str = mx_strdup(phys_dir);
-    //     mx_strdel(&phys_dir);
-    // }
-
     if (mx_strcmp(dir_str, "") != 0) {
 
         if (flags->prev) {

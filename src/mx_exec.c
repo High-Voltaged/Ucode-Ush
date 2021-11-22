@@ -1,12 +1,7 @@
 #include "../inc/ush.h"
 
 int mx_builtin_exec(t_cmd_utils* utils) {
-
-    if (mx_strcmp(utils->args[0], WHICH_STR) == 0) {
-        mx_which(utils, utils->args[2] ? utils->args[2] : utils->args[1]);
-        return 0;
-    }
-
+    
     for (int i = 0; builtin_cmds[i] != NULL; ++i) {
 
         if (mx_strcmp(utils->args[0], builtin_cmds[i]) == 0) {

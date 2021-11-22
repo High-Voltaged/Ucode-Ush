@@ -37,7 +37,9 @@ static bool is_builtin_cmd(const char* cmd) {
 
 }
 
-int mx_which(t_cmd_utils* utils, const char* to_find) {
+int mx_which(t_cmd_utils* utils) {
+
+    const char* to_find = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup(utils->args[1]);
 
     if (to_find == NULL)
         return 0;

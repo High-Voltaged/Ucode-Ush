@@ -4,6 +4,7 @@ void mx_ush_init(t_cmd_utils** utils) {
 
     (*utils)->args = NULL;
     (*utils)->env_vars = NULL;
+    (*utils)->exported_vars = NULL;
     mx_env_reset(utils);
     
 }
@@ -31,4 +32,5 @@ int main() {
 
 // make prompt go on a newline, if there was none before
 // change which -a to handle error + normal output
-// env -Pi /bin ls probably not working correctly
+// add output for the result of `cd -`
+// change $SHLVL variable
