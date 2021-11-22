@@ -51,6 +51,7 @@ void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
 void mx_env_add_flag(t_env_flags** flags, char flag);
 void mx_echo_add_flag(t_echo_flags** flags, char flag);
+char *mx_normalize_path(char *pwd, char *point);
 
 // COMMAND EXECUTION
 
