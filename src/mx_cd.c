@@ -101,18 +101,32 @@ int mx_cd(t_cmd_utils* utils) {
 
             char* cwd = malloc(sizeof(char) * PATH_MAX);
             cwd = getcwd(cwd, PATH_MAX);
+            char *path = mx_strdup(cwd);
             setenv(OLDPWD_STR, cwd, 1);
+            
             if (chdir(dir_str) == -1) {
                 perror("chdir");
                 return 0;
             }
             mx_strdel(&cwd);
-            cwd = malloc(sizeof(char) * PATH_MAX);
-            getcwd(cwd, PATH_MAX);
-            setenv(PWD_STR, cwd, 1);
+
+            if (flags->P) {
+
+                cwd = malloc(sizeof(char) * PATH_MAX);
+                getcwd(cwd, PATH_MAX);
+                setenv(PWD_STR, cwd, 1);
+
+            } else {
+
+                cwd = malloc(sizeof(char) * PATH_MAX);
+                cwd = mx_normalize_path(path, dir_str);
+                setenv(PWD_STR, cwd, 1);
+
+            }
             
             mx_strdel(&cwd);
             mx_strdel(&dir_str);
+            mx_strdel(&path);
             free(flags);
             mx_env_reset(&utils);
             return 0;

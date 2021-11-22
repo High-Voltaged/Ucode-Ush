@@ -34,3 +34,4 @@ int main() {
 // change which -a to handle error + normal output
 // add output for the result of `cd -`
 // change $SHLVL variable
+// read_line handling '' ""
