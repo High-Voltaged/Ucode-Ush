@@ -157,3 +157,32 @@ void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_cou
     }
 
 }
+
+void mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils) {
+
+    (*flags)->L = 1;
+    (*flags)->P = 0;
+
+    if (utils->args == NULL) return;
+
+    char* const_flags = "LP"; //const
+    for (int i = 1; utils->args[i] != NULL; ++i) {
+
+        char* arg = utils->args[i];
+        if ((arg[0] == '-') && !mx_isspace(arg[1])) {
+
+            for (int j = 1; arg[j] != '\0'; j++) {
+
+                if (mx_is_flag_found(const_flags, arg[j])) {
+                    mx_pwd_add_flag(flags, arg[j]);
+                } else {
+                    mx_print_pwd_flag_err(arg[j]);
+                    // exit(1);
+                }
+            
+            }
+
+        } else break;
+    }
+
+}

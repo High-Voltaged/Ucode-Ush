@@ -40,6 +40,10 @@ typedef struct s_echo_flags {
     int n, e, E;
 }              t_echo_flags;
 
+typedef struct s_pwd_flags {
+    int L, P;
+}              t_pwd_flags;
+
 // PARSING
 
 char* mx_read_line();
@@ -48,10 +52,12 @@ void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
 void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
 void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx);
 void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count);
+void mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
 void mx_env_add_flag(t_env_flags** flags, char flag);
 void mx_echo_add_flag(t_echo_flags** flags, char flag);
+void mx_pwd_add_flag(t_pwd_flags **flags, char flag);
 char *mx_normalize_path(char *pwd, char *point);
 
 // COMMAND EXECUTION
@@ -69,6 +75,7 @@ int mx_exit(t_cmd_utils* utils);
 
 void mx_print_flag_err(char flag);
 void mx_print_env_error(char flag);
+void mx_print_pwd_flag_err(char flag);
 
 // ENV COMMAND UTILS
 

@@ -47,11 +47,13 @@ static char *build_path(char **dir_names)
         }
 
         char *tmp = mx_strjoin(path, "/");
-        path ? mx_strdup(path) : (void) 0;
+        path ? mx_strdel(&path) : (void) 0;
 
         path = mx_strjoin(tmp, dir_names[i]);
-        mx_strdel(&tmp);
+        mx_strdel(&tmp);    
     }
+
+    !path ? mx_strdup("/") : (void) 0;
     
     return path;
 }

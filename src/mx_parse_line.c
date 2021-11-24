@@ -1,5 +1,35 @@
 #include "../inc/ush.h"
 
+static void handle_backslashes(char **args)
+{
+    if (!mx_strcmp(args[0], "echo"))
+    {
+        return;
+    }
+    
+    for (int i = 1; args[i] != NULL; i++)
+    {
+        args[i] = mx_replace_substr(args[i], "\\ ", " ");
+        args[i] = mx_replace_substr(args[i], "\\`", "`");
+        args[i] = mx_replace_substr(args[i], "\\'", "'");
+        args[i] = mx_replace_substr(args[i], "\\\"", "\"");
+
+        // mx_strcmp(args[0], "echo") != 0 ? args[i] = mx_replace_substr(args[i], "\\\\", "\\") : (void) 0;//?
+    }
+}
+
+// "sdfsdfsd sdfsdfs" - del quotes and join, 'dsfs' - del quotes
+// static void handle_quotes(char **args)
+// {
+
+//     for (int i = 1; args[i] != NULL; i++)
+//     {
+//         int q_index = mx_get_char_index(args[i], '\'');
+        
+//     }
+
+// }
+
 void mx_parse_line(t_cmd_utils *utils, char *line)
 {
     char *mod_line = mx_del_extra_spaces(line);
@@ -12,6 +42,7 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
         utils->args[1] = NULL;
         return;
     }
+    //
 
     int args_len = mx_count_words(mod_line, ' ') - mx_count_substr(mod_line, "\\ ");
     utils->args = malloc((args_len + 1) * sizeof(char*));
@@ -42,9 +73,6 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
 
     utils->args[args_len] = NULL;
 
-    for (int i = 0; utils->args[i] != NULL; i++)
-    {
-        utils->args[i] = mx_replace_substr(utils->args[i], "\\ ", " ");
-    }
+    handle_backslashes(utils->args);
     
 }

@@ -6,6 +6,14 @@ static void print_err_char(char flag) {
 
 }
 
+void mx_print_pwd_flag_err(char flag) {
+
+    mx_printerr("pwd: bad option: -");
+    print_err_char(flag);
+    mx_printerr("\n");
+
+}
+
 void mx_print_flag_err(char flag) {
 
     mx_printerr(USH_STR);
