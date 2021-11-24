@@ -62,6 +62,7 @@ int mx_env(t_cmd_utils* utils);
 int mx_echo(t_cmd_utils* utils);
 int mx_which(t_cmd_utils* utils);
 int mx_pwd(t_cmd_utils* utils);
+int mx_export(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
 // ERROR HANDLING
@@ -69,24 +70,28 @@ int mx_exit(t_cmd_utils* utils);
 void mx_print_flag_err(char flag);
 void mx_print_env_error(char flag);
 
-// MISC UTILS
+// ENV COMMAND UTILS
 
+void mx_environ_reset(t_cmd_utils* utils);
+void mx_env_reset(t_cmd_utils** utils);
 void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx);
 char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
 int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_path, int flag_i_on);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
 void mx_print_env_vars(t_cmd_utils* utils);
+char** mx_get_env_array(t_list* list);
+void mx_export_reset(t_cmd_utils** utils);
+
+
+// MISC UTILS
+
 char* get_dir_path(char* dir, const char* file_name);
-void mx_environ_reset(t_cmd_utils* utils);
-void mx_env_reset(t_cmd_utils** utils);
-void mx_clear_env_vars(t_cmd_utils** utils);
 bool mx_is_flag_found(char flags[], char flag);
 
-char** mx_get_env_array(t_cmd_utils* utils);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
-    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_exit, NULL 
+    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_export, &mx_exit, NULL 
 };
 
 #endif

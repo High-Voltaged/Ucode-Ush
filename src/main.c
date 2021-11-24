@@ -1,11 +1,26 @@
 #include "../inc/ush.h"
 
+void mx_set_shell_vars() {
+
+    int shlvl = mx_atoi(getenv("SHLVL"));
+    char* shlvl_str = mx_itoa(shlvl + 1);
+    setenv("SHLVL", shlvl_str, 1);
+    mx_strdel(&shlvl_str);
+
+    setenv("SHELL", "ush", 1); // probably a different shell path
+    // setenv("PROMPT", "u$h", 1);
+
+}
+
 void mx_ush_init(t_cmd_utils** utils) {
 
     (*utils)->args = NULL;
     (*utils)->env_vars = NULL;
     (*utils)->exported_vars = NULL;
+    
+    mx_set_shell_vars();
     mx_env_reset(utils);
+    mx_export_reset(utils);
     
 }
 
@@ -31,7 +46,7 @@ int main() {
 }
 
 // make prompt go on a newline, if there was none before
-// change which -a to handle error + normal output
+// check `which -a` for both shell builtin & 'not found' error
+// check `cd -P -` for symlinks & `cd - -P` for error
 // add output for the result of `cd -`
-// change $SHLVL variable
 // read_line handling '' ""

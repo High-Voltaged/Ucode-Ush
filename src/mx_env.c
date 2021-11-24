@@ -21,18 +21,6 @@ void mx_env_add_flag(t_env_flags** flags, char flag) {
 
 }
 
-void mx_print_env_vars(t_cmd_utils* utils) {
-
-    t_list* curr_var = utils->env_vars;
-    while (curr_var) {
-
-        printf("%s\n", curr_var->data);
-        curr_var = curr_var->next;
-
-    }
-
-}
-
 void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx) {
 
     for (int i = *arg_idx; utils->args[i] != NULL; ++i) {
@@ -86,14 +74,14 @@ int mx_env(t_cmd_utils* utils) {
         if (utils->args[curr_arg_idx]) {
 
             if (exec_env_utility(utils, curr_arg_idx, custom_path, flags->i) != 0)
-                mx_print_env_vars(utils);
+                mx_print_list(utils->env_vars);
 
         }
         mx_strdel(&custom_path);
 
     } else {
 
-        mx_print_env_vars(utils);
+        mx_print_list(utils->env_vars);
     
     }
     free(flags);

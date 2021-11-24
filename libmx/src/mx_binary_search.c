@@ -12,12 +12,13 @@ int mx_binary_search(char **arr, int size, const char *s, int *count)
         *count = coun;
         int m = l + (r - l) / 2;
 
-        if (mx_strcmp(arr[m], s) == 0)
+        int count = mx_get_char_index(arr[m], '=');
+        if (mx_strncmp(arr[m], s, count) == 0)
         {
             return m;
         }
 
-        if (mx_strcmp(arr[m], s) < 0)
+        if (mx_strncmp(arr[m], s, count) < 0)
         {
             l = m + 1;
         }

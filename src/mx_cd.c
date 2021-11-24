@@ -19,24 +19,6 @@ void mx_cd_add_flag(t_cd_flags** flags, char flag) {
 
 }
 
-char* get_linked_dir(const char* dir_path) {
-
-    struct stat stat;
-    lstat(dir_path, &stat);
-
-    char* result = mx_strnew(stat.st_size);
-    int bytes = readlink(dir_path, result, stat.st_size + 1);
-
-    if (bytes == -1) {
-        mx_strdel(&result);
-        return NULL;
-    }
-    result[bytes] = '\0';
-
-    return result;
-
-}
-
 int cd_prev(t_cmd_utils** utils) {
 
     char* cwd = malloc(sizeof(char) * PATH_MAX);
@@ -85,11 +67,11 @@ int mx_cd(t_cmd_utils* utils) {
 
     char* dir_str = NULL;
     if (flags->P)  {
-        dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup("");
+        dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : NULL;
     } else {
-        dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : mx_strdup("");
+        dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : NULL;
     }
-    if (mx_strcmp(dir_str, "") != 0) {
+    if (dir_str != NULL) {
 
         if (flags->prev) {
 
@@ -110,19 +92,9 @@ int mx_cd(t_cmd_utils* utils) {
             }
             mx_strdel(&cwd);
 
-            if (flags->P) {
-
-                cwd = malloc(sizeof(char) * PATH_MAX);
-                getcwd(cwd, PATH_MAX);
-                setenv(PWD_STR, cwd, 1);
-
-            } else {
-
-                cwd = malloc(sizeof(char) * PATH_MAX);
-                cwd = mx_normalize_path(path, dir_str);
-                setenv(PWD_STR, cwd, 1);
-
-            }
+            cwd = malloc(sizeof(char) * PATH_MAX);
+            cwd = flags->P ? getcwd(cwd, PATH_MAX) : mx_normalize_path(path, dir_str);
+            setenv(PWD_STR, cwd, 1);
             
             mx_strdel(&cwd);
             mx_strdel(&dir_str);
@@ -135,7 +107,6 @@ int mx_cd(t_cmd_utils* utils) {
 
     } else {
 
-        mx_strdel(&dir_str);
         free(flags);
         return cd_home(utils);
 

@@ -28,13 +28,17 @@ int mx_exec(t_cmd_utils* utils) {
         exit(1);
     }
     if (pid == 0) {
-        if (execvp(utils->args[0], utils->args) == -1) {
+
+        char** paths = mx_get_exec_paths(utils->args[0], NULL, true);
+        char** env_var_array = mx_get_env_array(utils->exported_vars);
+        if (execve(paths[0] ? paths[0] : utils->args[0], utils->args, env_var_array) == -1) {
             
             perror(utils->args[0]);
-            return 1;
-            // exit(1);
+            exit(1);
 
         }
+        mx_del_strarr(&paths);
+        mx_del_strarr(&env_var_array);
         return 0;
 
     }

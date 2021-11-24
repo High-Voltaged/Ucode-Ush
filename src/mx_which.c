@@ -44,14 +44,17 @@ int mx_which(t_cmd_utils* utils) {
     if (to_find == NULL)
         return 0;
 
+    t_wch_flags* flags = malloc(sizeof(*flags));
+    mx_wch_parse_flags(&flags, utils);
+    
     if (is_builtin_cmd(to_find)) {
         mx_printerr(to_find);
         mx_printerr(BUILTIN_CMD_ERR);
-        return 0;
+        if (!flags->a) {
+            free(flags);
+            return 0;
+        }
     }
-
-    t_wch_flags* flags = malloc(sizeof(*flags));
-    mx_wch_parse_flags(&flags, utils);
 
     char** paths = mx_get_exec_paths(to_find, NULL, !flags->a);
 

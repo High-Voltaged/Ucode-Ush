@@ -42,11 +42,11 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_pa
         char* env_util = mx_strdup(utils->args[util_arg_idx++]);
         char** util_args = mx_get_env_util_args(utils, util_arg_idx);
         char** paths = mx_get_exec_paths(env_util, custom_path, true);
-        char** env_var_array = mx_get_env_array(utils);
+        char** env_var_array = mx_get_env_array(utils->env_vars);
         if (execve(paths[0] ? paths[0] : env_util, util_args, env_var_array) == -1) {
 
             perror(env_util);
-            return 0;
+            exit(1);
 
         }
         mx_strdel(&env_util);
@@ -57,6 +57,7 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_pa
 
     }
     waitpid(pid, &status, 0);
+        
     // wait(&status);
     return 0;
 
@@ -122,15 +123,15 @@ void mx_env_reset(t_cmd_utils** utils) {
     
 }
 
-char** mx_get_env_array(t_cmd_utils* utils) {
+char** mx_get_env_array(t_list* list) {
 
-    char** env_array = malloc(sizeof(char*) * (mx_list_size(utils->env_vars) + 1));
+    char** env_array = malloc(sizeof(char*) * (mx_list_size(list) + 1));
 
     int i = 0;
-    t_list* curr_var = utils->env_vars;
+    t_list* curr_var = list;
     while (curr_var) {
 
-        env_array[i++] = curr_var->data;
+        env_array[i++] = mx_strdup(curr_var->data);
         curr_var = curr_var->next;
 
     }
