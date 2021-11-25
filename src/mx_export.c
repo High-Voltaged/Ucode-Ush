@@ -42,9 +42,9 @@ int mx_unset(t_cmd_utils* utils) {
 
     mx_parse_for_no_flags(utils, "unset");
 
-    for (int idx = 1; utils->args[idx] != NULL;) {
+    for (int idx = 1; utils->args[idx] != NULL; ++idx) {
 
-        if (mx_remove_env_var(&utils, &idx) != 0) {
+        if (mx_remove_env_var(&utils, utils->args[idx]) != 0) {
             exit(1);
         }
         char* var_name = mx_get_var_name(utils->args[idx - 1]);

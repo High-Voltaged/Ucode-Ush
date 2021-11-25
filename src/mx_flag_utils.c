@@ -56,7 +56,7 @@ void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
                 if (mx_is_flag_found(const_flags, arg[j])) {
                     mx_cd_add_flag(flags, arg[j]);
                 } else {
-                    mx_print_flag_err(arg[j], "cd");
+                    mx_print_option_err(arg[j], "cd");
                     // exit(1);
                 }
             
@@ -84,7 +84,7 @@ void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
                 if (mx_is_flag_found(const_flags, arg[j])) {
                     mx_wch_add_flag(flags, arg[j]);
                 } else {
-                    mx_print_flag_err(arg[j], "which");
+                    mx_print_option_err(arg[j], "which");
                     // exit(1);
                 }
             
@@ -95,40 +95,57 @@ void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
 
 }
 
-void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
+int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
     (*flags)->i = (*flags)->P = (*flags)->u = 0;
+    (*flags)->u_param = (*flags)->p_param = NULL;
 
-    if (utils->args == NULL) return;
+    if (utils->args == NULL) return 0;
 
-    char* const_flags = "iPu";
     for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
-        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+        if (mx_strstr(arg, "=") == NULL) {
+            if ((arg[0] == '-') && mx_isalpha(arg[1])) {
 
-            for (int j = 1; arg[j] != '\0'; j++) {
+                ++(*arg_idx);
+                int flag_count = mx_strlen(arg);
+                for (int j = 1; j < flag_count; j++) {
 
-                if (mx_is_flag_found(const_flags, arg[j])) {
+                    if (arg[j] == 'u') {
+                        
+                        mx_env_add_flag(flags, arg[j]);
+                        if (utils->args[i + 1] != NULL && j == flag_count - 1) {
+                            (*flags)->u_param = mx_strdup(utils->args[i + 1]);
+                            ++(*arg_idx);
+                        } else if (j == flag_count - 1) {
+                            mx_print_env_arg_err(arg[j]);
+                        }
                     
-                    if ((arg[j] == 'u' || arg[j] == 'P') && utils->args[i + 1] == NULL) {
-                        mx_print_env_error(arg[j]);
-                        continue; // possibly not continue
+                    } else if (arg[j] == 'P') {
+                        
+                        mx_env_add_flag(flags, arg[j]);
+                        if (utils->args[i + 1] != NULL && j == flag_count - 1) {
+                            (*flags)->p_param = mx_strdup(utils->args[i + 1]);
+                            ++(*arg_idx);
+                        } else if (j == flag_count - 1) {
+                            mx_print_env_arg_err(arg[j]);
+                        }
+                    
+                    } else if (arg[j] == 'i') {
+                       
+                        mx_env_add_flag(flags, arg[j]);
+                   
+                    } else {
+                        mx_print_option_err(arg[j], "env");
+                        --(*arg_idx);
+                        return 1;
                     }
-                    
-                    mx_env_add_flag(flags, arg[j]);
-                } else {
-                    mx_print_flag_err(arg[j], "env");
-                    // exit(1);
                 }
-            
-            }
-
+            } 
         } else break;
-        ++(*arg_idx);
-    
     }
-
+    return 0;
 }
 
 void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count) {
@@ -176,7 +193,7 @@ void mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils) {
                 if (mx_is_flag_found(const_flags, arg[j])) {
                     mx_pwd_add_flag(flags, arg[j]);
                 } else {
-                    mx_print_pwd_flag_err(arg[j]);
+                    mx_print_flag_err("pwd", arg[j]);
                     // exit(1);
                 }
             
@@ -196,7 +213,7 @@ void mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd) {
         char* arg = utils->args[i];
         if ((arg[0] == '-') && mx_isalpha(arg[1])) {
 
-            mx_print_flag_err(arg[1], cmd);
+            mx_print_option_err(arg[1], cmd);
             // print usage
 
         } else break;

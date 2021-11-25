@@ -19,6 +19,7 @@ int mx_exec(t_cmd_utils* utils) {
     if (utils->args[0] == NULL || mx_builtin_exec(utils) == 0) {
         return 1;
     }
+    printf("here\n");
 
     pid = fork();
     int status = 0;

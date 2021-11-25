@@ -50,24 +50,21 @@ void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx) {
 
 }
 
-int mx_remove_env_var(t_cmd_utils** utils, int* arg_idx) {
+int mx_remove_env_var(t_cmd_utils** utils, char* name) {
 
-    char* var_name = (*utils)->args[*arg_idx];
-    if (mx_strchr(var_name, '=') != NULL) {
+    if (mx_strchr(name, '=') != NULL) {
         mx_printerr("env: cannot unset '");
-        mx_printerr(var_name);
+        mx_printerr(name);
         mx_printerr("': Invalid argument\n");
-        ++(*arg_idx);
         return 1;
     }
 
     int env_index = 0;
     int export_index = 0;
-    mx_find_env_var((*utils)->env_vars, var_name, &env_index);
-    mx_find_env_var((*utils)->exported_vars, var_name, &export_index);
+    mx_find_env_var((*utils)->env_vars, name, &env_index);
+    mx_find_env_var((*utils)->exported_vars, name, &export_index);
     mx_env_pop_index(&(*utils)->env_vars, env_index);
     mx_env_pop_index(&(*utils)->exported_vars, export_index);
-    ++(*arg_idx);
     return 0;
 
 }
@@ -78,7 +75,8 @@ int mx_env(t_cmd_utils* utils) {
     t_env_flags* flags = malloc(sizeof(*flags));
     if (utils->args[1] != NULL) {
 
-        mx_env_parse_flags(&flags, utils, &curr_arg_idx);
+        if (mx_env_parse_flags(&flags, utils, &curr_arg_idx) != 0)
+            return 0;
 
         if (utils->args[curr_arg_idx]) {
 
