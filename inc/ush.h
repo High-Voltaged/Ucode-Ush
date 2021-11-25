@@ -7,16 +7,24 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <string.h>
 #include <unistd.h>
 #include <signal.h>
 #include <stdio.h>
 
 extern char** environ;
 
+typedef struct s_env_var {
+    char* name;
+    char* value;
+    int index;
+    struct s_env_var* next;
+}              t_env_var;
+
 typedef struct s_cmd_utils {
     char** args;        // arguments for the command 
-    t_list* env_vars; // saved enviroment variables
-    t_list* exported_vars;
+    t_env_var* env_vars; // saved enviroment variables
+    t_env_var* exported_vars;
     // int status;
 }              t_cmd_utils;
 
@@ -79,15 +87,28 @@ void mx_print_pwd_flag_err(char flag);
 
 // ENV COMMAND UTILS
 
-void mx_environ_reset(t_cmd_utils* utils);
 void mx_env_reset(t_cmd_utils** utils);
 void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx);
+void mx_unset_env_var(t_cmd_utils** utils, int* arg_idx);
 char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
-int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_path, int flag_i_on);
+int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
-void mx_print_env_vars(t_cmd_utils* utils);
-char** mx_get_env_array(t_list* list);
+
 void mx_export_reset(t_cmd_utils** utils);
+char* mx_get_var_str(t_env_var* env_var);
+
+t_env_var *mx_create_env_var(char* env_var);
+void mx_env_push_back(t_env_var **list, char* env_var);
+void mx_env_pop_index(t_env_var **list, int index);
+void mx_env_clear_list(t_env_var **list);
+int mx_env_list_size(t_env_var* list);
+void mx_print_env_list(t_env_var* list, bool is_env_cmd);
+void mx_env_sort_list(t_env_var** list, bool (*cmp)(char* a, char* b));
+t_env_var* mx_find_env_var(t_env_var* list, char* name, int* index);
+void mx_overwrite_env_var(t_env_var** env_var, const char* value);
+char* mx_get_var_name(const char* var);
+char* mx_get_var_value(const char* var);
+char** mx_get_env_array(t_env_var* list);
 
 
 // MISC UTILS

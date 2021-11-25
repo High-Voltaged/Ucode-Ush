@@ -19,7 +19,7 @@ char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx) {
 }
 
 // Execute the env's utility
-int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_path, int flag_i_on) {
+int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
 
     pid_t pid = fork();
     int status = 0;
@@ -30,20 +30,29 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_pa
     }
     if (pid == 0) {
 
-        if (flag_i_on)
-            mx_clear_list(&utils->env_vars);
+        if (flags->u)
+            mx_unset_env_var(&utils, &util_arg_idx);
+        
+        char* custom_path = flags->P ? mx_strdup(utils->args[util_arg_idx++]) : NULL;
+        if (flags->i)
+            mx_env_clear_list(&utils->env_vars);
 
         mx_set_env_vars(utils, &util_arg_idx);
+        
+        mx_print_env_list(utils->env_vars, true);
+        char** env_vars = mx_get_env_array(utils->env_vars);
 
+        mx_env_reset(&utils);
+        
         if (utils->args[util_arg_idx] == NULL) {
-            return 1;
+            mx_del_strarr(&env_vars);
+            exit(0);
         }
         
         char* env_util = mx_strdup(utils->args[util_arg_idx++]);
         char** util_args = mx_get_env_util_args(utils, util_arg_idx);
         char** paths = mx_get_exec_paths(env_util, custom_path, true);
-        char** env_var_array = mx_get_env_array(utils->env_vars);
-        if (execve(paths[0] ? paths[0] : env_util, util_args, env_var_array) == -1) {
+        if (execve(paths[0] ? paths[0] : env_util, util_args, env_vars) == -1) {
 
             perror(env_util);
             exit(1);
@@ -51,7 +60,7 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, const char* custom_pa
         }
         mx_strdel(&env_util);
         mx_del_strarr(&paths);
-        mx_del_strarr(&env_var_array);
+        mx_del_strarr(&env_vars);
         mx_del_strarr(&util_args);
         return 0;
 
@@ -111,31 +120,15 @@ char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool sing
 
 void mx_env_reset(t_cmd_utils** utils) {
 
-    int i = 0;
+    mx_env_clear_list(&(*utils)->exported_vars);
+    for (int i = 0; environ[i] != NULL; ++i) {
 
-    mx_clear_list(&(*utils)->env_vars);
+        // remove the LS_COLORS check later
+        if (mx_strstr(environ[i], "LS_COLORS") != NULL)
+            continue;
 
-    for (; environ && environ[i] != NULL; ++i) {
-            
-        mx_push_back(&(*utils)->env_vars, environ[i]);
-
-    }
-    
-}
-
-char** mx_get_env_array(t_list* list) {
-
-    char** env_array = malloc(sizeof(char*) * (mx_list_size(list) + 1));
-
-    int i = 0;
-    t_list* curr_var = list;
-    while (curr_var) {
-
-        env_array[i++] = mx_strdup(curr_var->data);
-        curr_var = curr_var->next;
+        mx_env_push_back(&(*utils)->env_vars, environ[i]);
 
     }
-    env_array[i] = NULL;
-    return env_array;
 
 }
