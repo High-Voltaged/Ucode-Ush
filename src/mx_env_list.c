@@ -198,7 +198,6 @@ void mx_env_sort_list(t_env_var** list, bool (*cmp)(char* a, char* b)) {
 char** mx_get_env_array(t_env_var* list) {
 
     char** env_array = malloc(sizeof(char*) * (mx_env_list_size(list) + 1));
-
     int i = 0;
     t_env_var* curr_var = list;
     while (curr_var) {

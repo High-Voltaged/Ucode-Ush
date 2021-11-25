@@ -18,7 +18,7 @@ void mx_ush_init(t_cmd_utils** utils) {
     (*utils)->env_vars = NULL;
     (*utils)->exported_vars = NULL;
     
-    mx_set_shell_vars();
+    // mx_set_shell_vars();
     mx_env_reset(utils);
     mx_export_reset(utils);
     
@@ -32,7 +32,7 @@ int main() {
 
     while (1) {
 
-        printf("%s", PROMPT_STR);
+        printf("%s", "u$h> ");
         char* line = mx_read_line();
         mx_parse_line(utils, line);
         mx_strdel(&line);

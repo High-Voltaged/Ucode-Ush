@@ -2,6 +2,7 @@
 
 int mx_atoi(const char *str)
 {
+    if (str == NULL) return 0;
     int result = 0;
     int sign = 1;
     int i = 0;

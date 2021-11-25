@@ -14,10 +14,11 @@ void mx_print_pwd_flag_err(char flag) {
 
 }
 
-void mx_print_flag_err(char flag) {
+void mx_print_flag_err(char flag, const char* cmd) {
 
     mx_printerr(USH_STR);
-    mx_printerr("invalid option -- ");
+    mx_printerr(cmd);
+    mx_printerr(": invalid option -- ");
     print_err_char(flag);
     mx_printerr("\n");
     // mx_printerr();
@@ -26,7 +27,7 @@ void mx_print_flag_err(char flag) {
 
 void mx_print_env_error(char flag) {
 
-    mx_printerr(ENV_ARG_ERR);
+    mx_printerr("env: option requires an argument -- '");
     print_err_char(flag);
     mx_printerr("'\n");
 

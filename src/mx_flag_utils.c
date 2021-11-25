@@ -56,7 +56,7 @@ void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
                 if (mx_is_flag_found(const_flags, arg[j])) {
                     mx_cd_add_flag(flags, arg[j]);
                 } else {
-                    mx_print_flag_err(arg[j]);
+                    mx_print_flag_err(arg[j], "cd");
                     // exit(1);
                 }
             
@@ -84,7 +84,7 @@ void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
                 if (mx_is_flag_found(const_flags, arg[j])) {
                     mx_wch_add_flag(flags, arg[j]);
                 } else {
-                    mx_print_flag_err(arg[j]);
+                    mx_print_flag_err(arg[j], "which");
                     // exit(1);
                 }
             
@@ -118,7 +118,7 @@ void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
                     
                     mx_env_add_flag(flags, arg[j]);
                 } else {
-                    mx_print_flag_err(arg[j]);
+                    mx_print_flag_err(arg[j], "env");
                     // exit(1);
                 }
             
@@ -181,6 +181,23 @@ void mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils) {
                 }
             
             }
+
+        } else break;
+    }
+
+}
+
+void mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd) {
+
+    if (utils->args == NULL) return;
+
+    for (int i = 1; utils->args[i] != NULL; ++i) {
+
+        char* arg = utils->args[i];
+        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+
+            mx_print_flag_err(arg[1], cmd);
+            // print usage
 
         } else break;
     }

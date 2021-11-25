@@ -30,8 +30,10 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
     }
     if (pid == 0) {
 
-        if (flags->u)
-            mx_unset_env_var(&utils, &util_arg_idx);
+        if (flags->u) {
+            if (mx_remove_env_var(&utils, &util_arg_idx) != 0)
+                exit(1);
+        }
         
         char* custom_path = flags->P ? mx_strdup(utils->args[util_arg_idx++]) : NULL;
         if (flags->i)
@@ -39,7 +41,9 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
 
         mx_set_env_vars(utils, &util_arg_idx);
         
-        mx_print_env_list(utils->env_vars, true);
+        if (utils->args[util_arg_idx] == NULL)
+            mx_print_env_list(utils->env_vars, true);
+        
         char** env_vars = mx_get_env_array(utils->env_vars);
 
         mx_env_reset(&utils);
@@ -120,8 +124,8 @@ char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool sing
 
 void mx_env_reset(t_cmd_utils** utils) {
 
-    mx_env_clear_list(&(*utils)->exported_vars);
-    for (int i = 0; environ[i] != NULL; ++i) {
+    mx_env_clear_list(&(*utils)->env_vars);
+    for (int i = 0; environ && environ[i] != NULL; ++i) {
 
         // remove the LS_COLORS check later
         if (mx_strstr(environ[i], "LS_COLORS") != NULL)

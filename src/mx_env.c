@@ -26,10 +26,10 @@ void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx) {
     for (int i = *arg_idx; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
-        char* var_name = mx_get_var_name(arg);
-        t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
         if (mx_strstr(arg, "=") != NULL) {
-
+            char* var_name = mx_get_var_name(arg);
+            t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
+            
             if (env_var == NULL) {
 
                 mx_env_push_back(&utils->env_vars, arg);
@@ -50,21 +50,25 @@ void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx) {
 
 }
 
-void mx_unset_env_var(t_cmd_utils** utils, int* arg_idx) {
+int mx_remove_env_var(t_cmd_utils** utils, int* arg_idx) {
 
     char* var_name = (*utils)->args[*arg_idx];
     if (mx_strchr(var_name, '=') != NULL) {
-        mx_printerr(ENV_UNSET_ERR);
+        mx_printerr("env: cannot unset '");
         mx_printerr(var_name);
-        mx_printerr(ENV_INVARG_ERR);
+        mx_printerr("': Invalid argument\n");
         ++(*arg_idx);
-        return;
+        return 1;
     }
 
-    int index = 0;
-    mx_find_env_var((*utils)->env_vars, var_name, &index);
-    mx_env_pop_index(&(*utils)->env_vars, index);
+    int env_index = 0;
+    int export_index = 0;
+    mx_find_env_var((*utils)->env_vars, var_name, &env_index);
+    mx_find_env_var((*utils)->exported_vars, var_name, &export_index);
+    mx_env_pop_index(&(*utils)->env_vars, env_index);
+    mx_env_pop_index(&(*utils)->exported_vars, export_index);
     ++(*arg_idx);
+    return 0;
 
 }
 
@@ -78,8 +82,7 @@ int mx_env(t_cmd_utils* utils) {
 
         if (utils->args[curr_arg_idx]) {
 
-            if (exec_env_utility(utils, curr_arg_idx, flags) != 0)
-                mx_print_env_list(utils->env_vars, true);
+            exec_env_utility(utils, curr_arg_idx, flags);
 
         }
 

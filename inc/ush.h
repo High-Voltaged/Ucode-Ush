@@ -60,6 +60,7 @@ void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
 void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
 void mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx);
 void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count);
+void mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd);
 void mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
@@ -77,11 +78,12 @@ int mx_echo(t_cmd_utils* utils);
 int mx_which(t_cmd_utils* utils);
 int mx_pwd(t_cmd_utils* utils);
 int mx_export(t_cmd_utils* utils);
+int mx_unset(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
 // ERROR HANDLING
 
-void mx_print_flag_err(char flag);
+void mx_print_flag_err(char flag, const char* cmd);
 void mx_print_env_error(char flag);
 void mx_print_pwd_flag_err(char flag);
 
@@ -89,7 +91,7 @@ void mx_print_pwd_flag_err(char flag);
 
 void mx_env_reset(t_cmd_utils** utils);
 void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx);
-void mx_unset_env_var(t_cmd_utils** utils, int* arg_idx);
+int mx_remove_env_var(t_cmd_utils** utils, int* arg_idx);
 char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
 int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
@@ -119,7 +121,7 @@ bool mx_is_flag_found(char flags[], char flag);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
-    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_export, &mx_exit, NULL 
+    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_export, &mx_unset, &mx_exit, NULL 
 };
 
 #endif

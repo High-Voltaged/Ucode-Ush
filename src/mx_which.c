@@ -49,7 +49,7 @@ int mx_which(t_cmd_utils* utils) {
     
     if (is_builtin_cmd(to_find)) {
         mx_printerr(to_find);
-        mx_printerr(BUILTIN_CMD_ERR);
+        mx_printerr(": shell built-in command\n");
         if (!flags->a) {
             free(flags);
             return 0;

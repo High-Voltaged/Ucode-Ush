@@ -26,7 +26,7 @@ char* mx_get_var_value(const char* var) {
     }
     return mx_strdup("");
 
-} 
+}
 
 char* mx_get_var_str(t_env_var* env_var) {
 
@@ -35,6 +35,24 @@ char* mx_get_var_str(t_env_var* env_var) {
     mx_strcat(result, "=");
     mx_strcat(result, env_var->value);
     return result;
+
+}
+
+int mx_unset(t_cmd_utils* utils) {
+
+    mx_parse_for_no_flags(utils, "unset");
+
+    for (int idx = 1; utils->args[idx] != NULL;) {
+
+        if (mx_remove_env_var(&utils, &idx) != 0) {
+            exit(1);
+        }
+        char* var_name = mx_get_var_name(utils->args[idx - 1]);
+        unsetenv(var_name);
+        mx_strdel(&var_name);
+
+    }
+    return 0;
 
 }
 
@@ -70,6 +88,7 @@ void mx_export_vars(t_cmd_utils* utils) {
 
 int mx_export(t_cmd_utils* utils) {
 
+    mx_parse_for_no_flags(utils, "export");
     if (utils->args[1] != NULL) {
         
         mx_export_vars(utils);
