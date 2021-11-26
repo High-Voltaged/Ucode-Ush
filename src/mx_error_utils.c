@@ -6,6 +6,12 @@ static void print_err_char(char flag) {
 
 }
 
+void mx_print_odd_quotes_err() {
+
+    mx_printerr("Odd number of quotes.\n");
+    
+}
+
 void mx_print_cmd_err(const char* cmd, const char* error) {
 
     mx_printerr(cmd);
