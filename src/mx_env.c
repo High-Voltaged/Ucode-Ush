@@ -73,10 +73,10 @@ int mx_env(t_cmd_utils* utils) {
 
     int curr_arg_idx = 1;
     t_env_flags* flags = malloc(sizeof(*flags));
-    if (utils->args[1] != NULL) {
+    if (mx_env_parse_flags(&flags, utils, &curr_arg_idx) != 0)
+        return 0;
 
-        if (mx_env_parse_flags(&flags, utils, &curr_arg_idx) != 0)
-            return 0;
+    if (utils->args[1] != NULL) {
 
         if (utils->args[curr_arg_idx]) {
 

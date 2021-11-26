@@ -121,6 +121,7 @@ char** mx_get_env_array(t_env_var* list);
 // MISC UTILS
 
 char* get_dir_path(char* dir, const char* file_name);
+int mx_util_arg_count(t_cmd_utils* utils);
 
 
 // Array of function pointers for commands

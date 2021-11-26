@@ -19,101 +19,83 @@ void mx_cd_add_flag(t_cd_flags** flags, char flag) {
 
 }
 
-int cd_prev(t_cmd_utils** utils, bool flag_p_on) {
+static void print_tilde_str(const char* curr_wd) {
 
-    char* oldpwd = malloc(sizeof(char) * PATH_MAX);
-    oldpwd = getcwd(oldpwd, PATH_MAX);
-    char *path = mx_strdup(oldpwd);
-
-    char* prev_wd = getenv(OLDPWD_STR);
-    // prev_wd = flag_p_on ? getenv(OLDPWD_STR) : mx_normalize_path(path, getenv(OLDPWD_STR));
-    // char* curr_wd = malloc(sizeof(char) * PATH_MAX);
-    // curr_wd = flag_p_on ? mx_strdup(prev_wd) : mx_normalize_path(path, prev_wd);
-    // printf("%s %d -- curr\n", prev_wd, flag_p_on);
-    chdir(prev_wd);
-
-    setenv(OLDPWD_STR, oldpwd, 1);
-    setenv(PWD_STR, prev_wd, 1);
-    
-    // if (!flag_p_on)
-        // mx_strdel(&prev_wd);
-    mx_strdel(&oldpwd);
-    mx_env_reset(utils);
-    return 0;
+    char* temp = mx_replace_substr(curr_wd, getenv(HOME_STR), "~");
+    mx_printstr(temp);
+    mx_printstr("\n");
+    mx_strdel(&temp);
 
 }
 
-int cd_home(t_cmd_utils* utils) {
+static char* replace_cd_arg(const char* sub, const char* to_replace) {
 
-    char* home = getenv(HOME_STR);
-    char* cwd = malloc(sizeof(char) * PATH_MAX);
+    char* pwd = getenv(PWD_STR);
+    if (mx_strstr(pwd, sub) == NULL) {
+        mx_printerr("cd: string not in pwd: ");
+        mx_printerr(sub);
+        mx_printerr("\n");
+        return NULL;
+    }
 
-    getcwd(cwd, PATH_MAX);
-    setenv(OLDPWD_STR, cwd, 1);
-
-    chdir(home);
-
-    setenv(PWD_STR, home, 1);
-
-    mx_strdel(&cwd);
-    mx_env_reset(&utils);
-    return 0;
+    return mx_replace_substr(pwd, sub, to_replace);
 
 }
 
 int mx_cd(t_cmd_utils* utils) {
 
     t_cd_flags* flags = malloc(sizeof(*flags));
-    if (mx_cd_parse_flags(&flags, utils) != 0)
-        return 0;
+    int arg_idx = mx_cd_parse_flags(&flags, utils);
 
     char* dir_str = NULL;
-    if (flags->P) {
-        dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : NULL;
+    bool is_replaceable = arg_idx > 1 && utils->args[arg_idx] && utils->args[arg_idx + 1];
+    if (!flags->prev && is_replaceable) {
+        dir_str = replace_cd_arg(utils->args[arg_idx], utils->args[arg_idx + 1]);
+
+        if (!dir_str) return 0;
+            
+    } else  if (flags->prev) {
+        
+        dir_str = mx_strdup(getenv(OLDPWD_STR));
+    
+    } else if (flags->P) {
+     
+        dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup(getenv(HOME_STR));
+    
     } else {
-        dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : NULL;
+     
+        dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : mx_strdup(getenv(HOME_STR));
+    
     }
-    if (dir_str != NULL) {
 
-        if (flags->prev) {
+    char* cwd = malloc(sizeof(char) * PATH_MAX);
+    cwd = getcwd(cwd, PATH_MAX);
+    char *path = mx_strdup(cwd);
+    cwd = flags->P ? cwd : mx_normalize_path(path, getenv(PWD_STR));
 
-            mx_strdel(&dir_str);
-            free(flags);
-            return cd_prev(&utils, flags->P == 1);
-            
-        } else {
-
-            char* cwd = malloc(sizeof(char) * PATH_MAX);
-            cwd = getcwd(cwd, PATH_MAX);
-            char *path = mx_strdup(cwd);
-            cwd = flags->P ? cwd : mx_normalize_path(path, getenv(PWD_STR));
-
-            setenv(OLDPWD_STR, cwd, 1);
-            mx_strdel(&cwd);
-            
-            if (chdir(dir_str) == -1) {
-                mx_print_cmd_err("cd", strerror(errno));
-                return 0;
-            }
-
-            char* curr_wd = malloc(sizeof(char) * PATH_MAX);
-            curr_wd = flags->P ? getcwd(curr_wd, PATH_MAX) : mx_normalize_path(path, dir_str);
-            setenv(PWD_STR, curr_wd, 1);
-            
-            mx_strdel(&curr_wd);
-            mx_strdel(&dir_str);
-            mx_strdel(&path);
-            free(flags);
-            mx_env_reset(&utils);
-            return 0;
-
-        }
-
-    } else {
-
-        free(flags);
-        return cd_home(utils);
-
+    setenv(OLDPWD_STR, cwd, 1);
+    mx_strdel(&cwd);
+    
+    if (chdir(dir_str) == -1) {
+        mx_print_cmd_err("cd", strerror(errno));
+        printf("%d\n", errno);
+        return 0;
     }
+
+    char* curr_wd = malloc(sizeof(char) * PATH_MAX);
+    curr_wd = flags->P ? getcwd(curr_wd, PATH_MAX) : mx_normalize_path(path, dir_str);
+    
+    if (flags->prev || is_replaceable) {
+        print_tilde_str(curr_wd);
+    }
+    setenv(PWD_STR, curr_wd, 1);
+    
+    mx_strdel(&curr_wd);
+    mx_strdel(&dir_str);
+    mx_strdel(&path);
+    free(flags);
+    mx_env_reset(&utils);
+    // mx_export_reset(&utils);
+    return 0;
 
 }

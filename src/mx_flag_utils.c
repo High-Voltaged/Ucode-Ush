@@ -40,17 +40,16 @@ int mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
     (*flags)->P = (*flags)->prev = (*flags)->s = 0;
 
     if (utils->args == NULL) return 0;
-
+    int i = 1;
     const char* const_flags = "sP";
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
-        if (arg[0] == '-' && mx_strlen(arg) == 1) {
+        if (arg[0] == '-' && mx_strlen(arg) == 1 && !utils->args[i + 1]) {
             mx_cd_add_flag(flags, arg[0]);
             continue;
         } 
-        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
-
+        if ((arg[0] == '-') && !mx_isspace(arg[1])) {
             for (int j = 1; arg[j] != '\0'; j++) {
 
                 if (is_flag_found(const_flags, arg[j])) {
@@ -61,7 +60,7 @@ int mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
 
         } else break;
     }
-    return 0;
+    return i;
 
 }
 
@@ -75,7 +74,7 @@ int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
     for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
-        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+        if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             for (int j = 1; arg[j] != '\0'; j++) {
 
@@ -106,7 +105,7 @@ int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
         char* arg = utils->args[i];
         if (mx_strstr(arg, "=") == NULL) {
-            if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+            if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
                 ++(*arg_idx);
                 int flag_count = mx_strlen(arg);
@@ -161,7 +160,7 @@ void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_cou
     for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
-        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+        if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             if (!is_only_flags(const_flags, arg))
                 return;
@@ -213,7 +212,7 @@ int mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd) {
     for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
-        if ((arg[0] == '-') && mx_isalpha(arg[1])) {
+        if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             mx_print_flag_err(cmd, arg[1]);
             return 1;
