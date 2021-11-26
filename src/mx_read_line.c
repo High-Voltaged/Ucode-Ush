@@ -8,7 +8,7 @@ char* mx_read_line() {
     if (getline(&line, &length, stdin) == -1) {
 
         free(line);
-        perror("getline");
+        // perror("getline");
         exit(1);
 
     }

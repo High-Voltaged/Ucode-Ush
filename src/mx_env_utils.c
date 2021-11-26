@@ -18,6 +18,22 @@ char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx) {
 
 }
 
+static void handle_new_process(t_cmd_utils* utils, t_env_flags* flags, int* util_arg_idx) {
+
+    if (flags->u) {
+        if (mx_remove_env_var(&utils, flags->u_param) != 0)
+            exit(1);
+    }
+    if (flags->i)
+        mx_env_clear_list(&utils->env_vars);
+
+    mx_set_env_vars(utils, util_arg_idx);
+
+    if (utils->args[*util_arg_idx] == NULL)
+        mx_print_env_list(utils->env_vars, true);
+
+}
+
 // Execute the env's utility
 int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
 
@@ -25,24 +41,13 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
     int status = 0;
 
     if (pid == -1) {
-        perror("fork");
+        mx_print_cmd_err("fork", strerror(errno));
         exit(1);
     }
     if (pid == 0) {
-
-        if (flags->u) {
-            if (mx_remove_env_var(&utils, flags->u_param) != 0)
-                exit(1);
-        }
+        
+        handle_new_process(utils, flags, &util_arg_idx);
         char* custom_path = flags->P ? mx_strdup(flags->p_param) : NULL;
-        if (flags->i)
-            mx_env_clear_list(&utils->env_vars);
-
-        mx_set_env_vars(utils, &util_arg_idx);
-        
-        if (utils->args[util_arg_idx] == NULL)
-            mx_print_env_list(utils->env_vars, true);
-        
         char** env_vars = mx_get_env_array(utils->env_vars);
         mx_env_reset(&utils);
         

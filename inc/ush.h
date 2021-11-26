@@ -59,12 +59,12 @@ typedef struct s_pwd_flags {
 
 char* mx_read_line();
 void mx_parse_line(t_cmd_utils *utils, char *line);
-void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
-void mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
+int mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils);
+int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils);
 int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx);
 void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count);
-void mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd);
-void mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils);
+int mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd);
+int mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
 void mx_env_add_flag(t_env_flags** flags, char flag);
@@ -86,8 +86,9 @@ int mx_exit(t_cmd_utils* utils);
 
 // ERROR HANDLING
 
+void mx_print_cmd_err(const char* cmd, const char* error);
 void mx_print_flag_err(const char* cmd, char flag);
-void mx_print_option_err(char flag, const char* cmd);
+void mx_print_env_option_err(char flag, const char* cmd);
 void mx_print_env_error(const char* error, const char* env_util);
 void mx_print_env_arg_err(char flag);
 
@@ -120,7 +121,6 @@ char** mx_get_env_array(t_env_var* list);
 // MISC UTILS
 
 char* get_dir_path(char* dir, const char* file_name);
-bool mx_is_flag_found(char flags[], char flag);
 
 
 // Array of function pointers for commands

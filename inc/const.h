@@ -16,4 +16,6 @@ static const char* PATH_STR = "PATH";
 
 static const char* USH_STR = "ush: ";
 
+static const char* ENV_USAGE = "usage: env [-i] [-P utilpath] [-u name]\n\t   [name=value ...] [utility [argument ...]]\n";
+
 #endif

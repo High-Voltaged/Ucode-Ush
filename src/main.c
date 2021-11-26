@@ -46,9 +46,11 @@ int main() {
 }
 
 // make prompt go on a newline, if there was none before
-// check `which -a` for both shell builtin & 'not found' error -- just output the error
 // check `cd -P -` for symlinks & `cd - -P` for error -- output physical dir regardless
 // add output for the result of `cd -`
 // add single quotes for when exported var values contain neither alpha nor digits
 // read_line handling '' ""
 // perror sometimes overwriting prompt
+
+// test on Mac:
+// check for flags which contain digits

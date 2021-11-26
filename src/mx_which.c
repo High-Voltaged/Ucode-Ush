@@ -45,7 +45,8 @@ int mx_which(t_cmd_utils* utils) {
         return 0;
 
     t_wch_flags* flags = malloc(sizeof(*flags));
-    mx_wch_parse_flags(&flags, utils);
+    if (mx_wch_parse_flags(&flags, utils) != 0)
+        return 0;
     
     if (is_builtin_cmd(to_find)) {
         mx_printerr(to_find);

@@ -6,6 +6,15 @@ static void print_err_char(char flag) {
 
 }
 
+void mx_print_cmd_err(const char* cmd, const char* error) {
+
+    mx_printerr(cmd);
+    mx_printerr(": ");
+    mx_printerr(error);
+    mx_printerr("\n");
+
+}
+
 void mx_print_flag_err(const char* cmd, char flag) {
 
     // mx_printerr(USH_STR);
@@ -16,21 +25,23 @@ void mx_print_flag_err(const char* cmd, char flag) {
 
 }
 
-void mx_print_option_err(char flag, const char* cmd) {
+void mx_print_env_option_err(char flag, const char* cmd) {
 
-    mx_printerr(USH_STR);
+    // mx_printerr(USH_STR);
     mx_printerr(cmd);
     mx_printerr(": invalid option -- ");
     print_err_char(flag);
     mx_printerr("\n");
+    mx_printerr(ENV_USAGE);
 
 }
 
 void mx_print_env_arg_err(char flag) {
 
-    mx_printerr("env: option requires an argument -- '");
+    mx_printerr("env: option requires an argument -- ");
     print_err_char(flag);
-    mx_printerr("'\n");
+    mx_printerr("\n");
+    mx_printerr(ENV_USAGE);
 
 }
 

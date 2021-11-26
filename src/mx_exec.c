@@ -19,22 +19,22 @@ int mx_exec(t_cmd_utils* utils) {
     if (utils->args[0] == NULL || mx_builtin_exec(utils) == 0) {
         return 1;
     }
-    printf("here\n");
 
     pid = fork();
     int status = 0;
 
     if (pid == -1) {
-        perror("fork");
+        mx_print_cmd_err("fork", strerror(errno));
         exit(1);
     }
     if (pid == 0) {
 
         char** paths = mx_get_exec_paths(utils->args[0], NULL, true);
         char** env_var_array = mx_get_env_array(utils->exported_vars);
-        if (execve(paths[0] ? paths[0] : utils->args[0], utils->args, env_var_array) == -1) {
+        char* utility = paths[0] ? paths[0] : utils->args[0];
+        if (execve(utility, utils->args, env_var_array) == -1) {
             
-            perror(utils->args[0]);
+            mx_print_cmd_err(utils->args[0], strerror(errno));
             exit(1);
 
         }

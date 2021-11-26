@@ -13,7 +13,7 @@ char* mx_get_var_name(const char* var) {
     mx_strdel(&var_name);
     return result;
 
-} 
+}
 
 char* mx_get_var_value(const char* var) {
 
@@ -40,7 +40,8 @@ char* mx_get_var_str(t_env_var* env_var) {
 
 int mx_unset(t_cmd_utils* utils) {
 
-    mx_parse_for_no_flags(utils, "unset");
+    if (mx_parse_for_no_flags(utils, "unset") != 0)
+        return 0;
 
     for (int idx = 1; utils->args[idx] != NULL; ++idx) {
 
@@ -62,6 +63,14 @@ void mx_export_vars(t_cmd_utils* utils) {
 
         char* arg = utils->args[i];
         char* var_name = mx_get_var_name(arg);
+        char* var_value = mx_get_var_value(arg);
+        if (mx_strlen(var_name) == 0) {
+            mx_strdel(&var_name);
+            mx_printerr(USH_STR);
+            mx_printerr(var_value);
+            mx_printerr(" not found\n");
+            continue;
+        }
         t_env_var* exported_var = mx_find_env_var(utils->exported_vars, var_name, NULL);
         if (exported_var == NULL) {
 
@@ -71,15 +80,14 @@ void mx_export_vars(t_cmd_utils* utils) {
         } else if (mx_strstr(arg, "=") != NULL) {
 
             t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
-            char* var_value = mx_get_var_value(arg);
             if (var_value)
                 setenv(var_name, var_value, 1);
             
             mx_overwrite_env_var(&exported_var, var_value);
             mx_overwrite_env_var(&env_var, var_value);
-            mx_strdel(&var_value);
         
         } 
+        mx_strdel(&var_value);
         mx_strdel(&var_name);
         
     }
@@ -88,7 +96,9 @@ void mx_export_vars(t_cmd_utils* utils) {
 
 int mx_export(t_cmd_utils* utils) {
 
-    mx_parse_for_no_flags(utils, "export");
+    if (mx_parse_for_no_flags(utils, "export") != 0)
+        return 0;
+
     if (utils->args[1] != NULL) {
         
         mx_export_vars(utils);
