@@ -186,6 +186,13 @@ int mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils) {
     for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
+
+        if (arg[0] != '-')
+        {
+            mx_print_too_many_args_err("pwd");
+            return 1;
+        }
+        
         if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             for (int j = 1; arg[j] != '\0'; j++) {

@@ -12,6 +12,14 @@ void mx_print_odd_quotes_err() {
     
 }
 
+void mx_print_too_many_args_err(const char* cmd) {
+
+    mx_printerr(cmd);
+    mx_printerr(": ");
+    mx_printerr("too many arguments\n");
+    
+}
+
 void mx_print_cmd_err(const char* cmd, const char* error) {
 
     mx_printerr(cmd);

@@ -87,6 +87,7 @@ int mx_exit(t_cmd_utils* utils);
 // ERROR HANDLING
 
 void mx_print_odd_quotes_err();
+void mx_print_too_many_args_err(const char* cmd);
 void mx_print_cmd_err(const char* cmd, const char* error);
 void mx_print_flag_err(const char* cmd, char flag);
 void mx_print_env_option_err(char flag, const char* cmd);

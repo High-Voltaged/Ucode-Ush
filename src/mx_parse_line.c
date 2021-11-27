@@ -14,6 +14,21 @@
 //     return false;
 // }
 
+// "sdfsdfsd sdfsdfs" - del quotes and join, 'dsfs' - del quotes
+static void check_odd_quotes(char *str)
+{
+    char *quotes[] = {"'", "\"", "`", NULL};
+    char *b_quotes[] = {"\\'", "\\\"", "\\`", NULL};
+
+    for (int i = 0; quotes[i] != NULL; i++)
+    {
+        if ((mx_count_substr(str, quotes[i]) - mx_count_substr(str, b_quotes[i])) % 2 != 0)
+        {
+            mx_print_odd_quotes_err();
+        }
+    }
+}
+
 static char *replace_substr_free(char *str, char *sub, char *replace)
 {
     char *tmp = str;
@@ -25,7 +40,7 @@ static char *replace_substr_free(char *str, char *sub, char *replace)
 
 static void handle_backslashes(char **args)
 {
-    if (!mx_strcmp(args[0], "echo") || !mx_strcmp(args[0], "\"echo\""))
+    if (!mx_strcmp(args[0], "echo") || !mx_strcmp(args[0], "\"echo\"") || !mx_strcmp(args[0], "'echo'"))
     {
         return;
     }
@@ -43,20 +58,6 @@ static void handle_backslashes(char **args)
     }
 }
 
-// "sdfsdfsd sdfsdfs" - del quotes and join, 'dsfs' - del quotes
-static void check_odd_quotes(char *str)
-{
-    char *quotes[] = {"'", "\"", "`", NULL};
-    char *b_quotes[] = {"\\'", "\\\"", "\\`", NULL};
-
-    for (int i = 0; quotes[i] != NULL; i++)
-    {
-        if ((mx_count_substr(str, quotes[i]) - mx_count_substr(str, b_quotes[i])) % 2 != 0)
-        {
-            mx_print_odd_quotes_err();
-        }
-    }
-}
 
 static void del_extra_quotes(char **args)
 {
@@ -64,9 +65,14 @@ static void del_extra_quotes(char **args)
     {
         if (args[i][0] == '\'' || args[i][0] == '"')
         {
-            char *tmp = mx_strndup(args[i] + 1, mx_strlen(args[i]) - 1); //dup without quotes
+            char *tmp = mx_strndup(args[i] + 1, mx_strlen(args[i]) - 2); //dup without quotes
             mx_strdel(&args[i]);
             args[i] = tmp;
+        }
+
+        if (i == 0 && !mx_strcmp(args[0], "echo"))
+        {
+            return;
         }
     }
 }
@@ -90,8 +96,8 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
     //
 
     char *tmp = mod_line;
-    int i;
     int space_index = 0;
+    int i;
 
     for (i = 0; space_index != -1; i++)
     {
@@ -105,7 +111,6 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
             backslash_index = mx_get_substr_index(tmp, "\\ ");
         }
 
-        tmp += space_index + 1;
         utils->args = mx_realloc(utils->args, (i + 2) * sizeof(char *));
 
         if (space_index == -1)
@@ -114,20 +119,22 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
         }
         else if (mod_line[0] == '"')
         {
-            utils->args[i] = mx_strndup(mod_line, mx_get_substr_index(mod_line + 1, "\"") + 2);
-            tmp += mx_get_substr_index(mod_line + 1, "\"") + 2;
-            space_index = mx_get_char_index(tmp, ' ');
+            utils->args[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\"') + 2);
+            tmp += mx_get_char_index(mod_line + 1, '\"') + 2;
+            // space_index = mx_get_char_index(tmp, ' ');
         }
         else if (mod_line[0] == '\'')
         {
-            utils->args[i] = mx_strndup(mod_line, mx_get_substr_index(mod_line + 1, "'") + 2);
-            tmp += mx_get_substr_index(mod_line + 1, "'") + 2;
-            space_index = mx_get_char_index(tmp, ' ');
+            utils->args[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\'') + 2);
+            tmp += mx_get_char_index(mod_line + 1, '\'') + 2;
+            // space_index = mx_get_char_index(tmp, ' ');
         }
         else
         {
+            tmp += space_index + 1;
             utils->args[i] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp) - 1);
         }
+        // printf("'%s' -- '%s'(%d)\n", mod_line, tmp, space_index);
 
         while (mx_isspace(tmp[0]))
         {
@@ -141,4 +148,10 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
 
     handle_backslashes(utils->args);
     del_extra_quotes(utils->args);
+
+    // for (int i = 0; utils->args[i] != NULL; i++)
+    // {
+    //     printf("'%s'\n", utils->args[i]);
+    // }
+    
 }

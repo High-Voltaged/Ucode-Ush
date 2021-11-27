@@ -51,6 +51,7 @@ int main() {
 // add single quotes for when exported var values contain neither alpha nor digits
 // read_line handling '' ""
 // perror sometimes overwriting prompt
+// fix check_odd_quotes
 
 // test on Mac:
 // check for flags which contain digits
