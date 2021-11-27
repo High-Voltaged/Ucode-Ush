@@ -15,7 +15,7 @@
 // }
 
 // "sdfsdfsd sdfsdfs" - del quotes and join, 'dsfs' - del quotes
-static void check_odd_quotes(char *str)
+static int check_odd_quotes(char *str)
 {
     char *quotes[] = {"'", "\"", "`", NULL};
     char *b_quotes[] = {"\\'", "\\\"", "\\`", NULL};
@@ -25,8 +25,11 @@ static void check_odd_quotes(char *str)
         if ((mx_count_substr(str, quotes[i]) - mx_count_substr(str, b_quotes[i])) % 2 != 0)
         {
             mx_print_odd_quotes_err();
+            return 1;
         }
     }
+
+    return 0;
 }
 
 static char *replace_substr_free(char *str, char *sub, char *replace)
@@ -58,6 +61,69 @@ static void handle_backslashes(char **args)
     }
 }
 
+static int handle_tilde(char **args)
+{
+    for (int i = 0; args[i] != NULL; i++)
+    {
+        if (args[i][0] == '~')
+        {
+            args[i] = replace_substr_free(args[i], "~+", getenv(PWD_STR));
+            args[i] = replace_substr_free(args[i], "~-", getenv(OLDPWD_STR));
+
+            int tilde_index;
+            if ((tilde_index = mx_get_char_index(args[i], '~')) != -1)
+            {
+                if (mx_strlen(args[i]) > 1 && !mx_isspace(args[i][tilde_index + 1]) && args[i][tilde_index + 1] != '/')
+                {
+                    int slash_idx = mx_get_char_index(args[i], '/');
+                    char *username = NULL;
+
+                    if (slash_idx != -1)
+                    {
+                        username = mx_strndup(&args[i][tilde_index + 1], slash_idx + 1);
+                    }
+                    else
+                    {
+                        username = mx_strdup(&args[i][tilde_index + 1]);
+                    }
+
+                    if (mx_get_char_index(username, ' ') == -1)
+                    {
+                        char *path = mx_replace_substr(getenv(HOME_STR), getenv("USER"), username);
+
+                        DIR* dir = opendir(path);
+
+                        if (errno == ENOENT) {
+                            mx_printerr("ush: no such user or named directory: ");
+                            mx_printerr(username);
+                            mx_printerr("\n");
+
+                            return 1;
+                        } 
+                        else 
+                        {    
+                            mx_strdel(&args[i]);
+                            args[i] = path;
+                        }
+                    }
+                    else
+                    {
+                        mx_strdel(&username);
+                        return 0;
+                    }
+
+                    mx_strdel(&username);
+                }
+                else
+                {
+                    args[i] = replace_substr_free(args[i], "~", getenv(HOME_STR));
+                }
+            }
+        }
+    }
+
+    return 0;
+}
 
 static void del_extra_quotes(char **args)
 {
@@ -77,10 +143,12 @@ static void del_extra_quotes(char **args)
     }
 }
 
-void mx_parse_line(t_cmd_utils *utils, char *line)
+int mx_parse_line(t_cmd_utils *utils, char *line)
 {
     char *mod_line = mx_strtrim(line);
-    check_odd_quotes(mod_line);
+    if (check_odd_quotes(mod_line) != 0)
+        return 1;
+
     utils->args = NULL;
 
     //for line with only func name without args
@@ -91,7 +159,7 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
         utils->args[1] = NULL;
         // handle_backslashes(utils->args);
         del_extra_quotes(utils->args);
-        return;
+        return 0;
     }
     //
 
@@ -121,20 +189,17 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
         {
             utils->args[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\"') + 2);
             tmp += mx_get_char_index(mod_line + 1, '\"') + 2;
-            // space_index = mx_get_char_index(tmp, ' ');
         }
         else if (mod_line[0] == '\'')
         {
             utils->args[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\'') + 2);
             tmp += mx_get_char_index(mod_line + 1, '\'') + 2;
-            // space_index = mx_get_char_index(tmp, ' ');
         }
         else
         {
             tmp += space_index + 1;
             utils->args[i] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp) - 1);
         }
-        // printf("'%s' -- '%s'(%d)\n", mod_line, tmp, space_index);
 
         while (mx_isspace(tmp[0]))
         {
@@ -147,11 +212,11 @@ void mx_parse_line(t_cmd_utils *utils, char *line)
     utils->args[i] = NULL;
 
     handle_backslashes(utils->args);
+
+    if (handle_tilde(utils->args) != 0)
+        return 1;
+
     del_extra_quotes(utils->args);
 
-    // for (int i = 0; utils->args[i] != NULL; i++)
-    // {
-    //     printf("'%s'\n", utils->args[i]);
-    // }
-    
+    return 0;
 }

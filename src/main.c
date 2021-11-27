@@ -40,7 +40,8 @@ int main() {
         char** lines = mx_read_line();
         for (int i = 0; lines[i] != NULL; ++i) {
 
-            mx_parse_line(utils, lines[i]);
+            if (mx_parse_line(utils, lines[i]) != 0) 
+                continue;
             status = mx_exec(utils);
 
         }
