@@ -33,7 +33,7 @@ int mx_exec(t_cmd_utils* utils) {
         char** env_var_array = mx_get_env_array(utils->exported_vars);
         char* utility = paths[0] ? paths[0] : utils->args[0];
         if (execve(utility, utils->args, env_var_array) == -1) {
-            
+
             mx_print_cmd_err(utils->args[0], strerror(errno));
             exit(1);
 

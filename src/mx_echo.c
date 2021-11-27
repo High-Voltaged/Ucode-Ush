@@ -73,8 +73,6 @@ static void print_bec(char *str, int *letter_count, bool quotes)
 
     int bec_pos = quotes ? 0 : 1;
 
-    
-
     //for out backslashes like in zsh
     if (str[bec_pos + 1] == '\\' && str[bec_pos + 2] != '\\')
     {

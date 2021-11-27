@@ -37,28 +37,12 @@ int mx_pwd(t_cmd_utils* utils)
         char *cwd = NULL;
         (cwd = getenv(PWD_STR)) ? print_pwd(cwd) : (void) 0;
 
-        // if ((cwd = getenv(PWD_STR)))
-        // {
-        //     print_pwd(cwd);
-        // }
-        // else
-        // {
-        //     perror("getcwd");
-        // }
     }
     else if (flags->P)
     {
         char cwd[PATH_MAX];
         realpath(getenv(PWD_STR), cwd) ? print_pwd(cwd) : (void) 0; // if env clear PWD wariable?
 
-        // if ((realpath(getenv(PWD_STR), cwd))) 
-        // {
-        //     print_pwd(cwd);
-        // }
-        // else
-        // {
-        //     perror("realpath");
-        // }
     }
 
     return 0;
