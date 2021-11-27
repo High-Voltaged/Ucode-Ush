@@ -25,7 +25,6 @@ void mx_print_cmd_err(const char* cmd, const char* error) {
     mx_printerr(cmd);
     mx_printerr(": ");
     mx_printerr(error);
-    mx_printerr("\n");
 
 }
 

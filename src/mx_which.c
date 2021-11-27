@@ -39,34 +39,36 @@ static bool is_builtin_cmd(const char* cmd) {
 
 int mx_which(t_cmd_utils* utils) {
 
-    const char* to_find = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup(utils->args[1]);
-
-    if (to_find == NULL)
-        return 0;
-
     t_wch_flags* flags = malloc(sizeof(*flags));
-    if (mx_wch_parse_flags(&flags, utils) != 0)
+    int arg_idx = 1;
+    if (mx_wch_parse_flags(&flags, utils, &arg_idx) != 0)
         return 0;
-    
-    if (is_builtin_cmd(to_find)) {
-        mx_printerr(to_find);
-        mx_printerr(": shell built-in command\n");
-        if (!flags->a) {
-            free(flags);
-            return 0;
+
+    for (int i = arg_idx; utils->args[i] != NULL; ++i) {
+
+        char* to_find = utils->args[i];
+        if (is_builtin_cmd(to_find)) {
+            mx_printerr(to_find);
+            mx_printerr(": shell built-in command\n");
+            if (!flags->a) {
+                free(flags);
+                return 0;
+            }
         }
+
+        char** paths = mx_get_exec_paths(to_find, NULL, !flags->a);
+
+        if (paths[0] == NULL) {
+            mx_printerr(to_find);
+            mx_printerr(" not found\n");
+        } else {
+            mx_print_strarr(paths, "\n");
+        }
+
+        mx_del_strarr(&paths);
+
     }
 
-    char** paths = mx_get_exec_paths(to_find, NULL, !flags->a);
-
-    if (paths[0] == NULL) {
-        mx_printerr(to_find);
-        mx_printerr(" not found\n");
-    } else {
-        mx_print_strarr(paths, "\n");
-    }
-
-    mx_del_strarr(&paths);
     free(flags);
 
     return 0;

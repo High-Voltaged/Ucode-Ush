@@ -1,6 +1,6 @@
 #include "../inc/ush.h"
 
-char* mx_read_line() {
+char** mx_read_line() {
 
     char* line = NULL;
     size_t length = 0;
@@ -8,10 +8,11 @@ char* mx_read_line() {
     if (getline(&line, &length, stdin) == -1) {
 
         free(line);
-        // perror("getline");
         exit(1);
 
     }
-    return line;
+    char** separated = mx_strsplit(line, ';');
+    mx_strdel(&line);
+    return separated;
 
 }

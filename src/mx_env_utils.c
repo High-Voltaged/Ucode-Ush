@@ -42,6 +42,7 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
 
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
+        mx_printerr("\n");
         exit(1);
     }
     if (pid == 0) {

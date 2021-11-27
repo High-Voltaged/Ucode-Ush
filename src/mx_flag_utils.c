@@ -35,21 +35,23 @@ static bool is_only_flags(const char* flags, char* flags_str) {
     return true;
 }
 
-int mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
+void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
     (*flags)->P = (*flags)->prev = (*flags)->s = 0;
 
-    if (utils->args == NULL) return 0;
-    int i = 1;
+    if (utils->args == NULL) return;
     const char* const_flags = "sP";
-    for (; utils->args[i] != NULL; ++i) {
+    for (int i = 1; utils->args[i] != NULL; ++i) {
 
         char* arg = utils->args[i];
         if (arg[0] == '-' && mx_strlen(arg) == 1 && !utils->args[i + 1]) {
             mx_cd_add_flag(flags, arg[0]);
+            ++(*arg_idx);
             continue;
         } 
         if ((arg[0] == '-') && !mx_isspace(arg[1])) {
+
+            ++(*arg_idx);
             for (int j = 1; arg[j] != '\0'; j++) {
 
                 if (is_flag_found(const_flags, arg[j])) {
@@ -60,11 +62,10 @@ int mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils) {
 
         } else break;
     }
-    return i;
 
 }
 
-int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
+int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
     (*flags)->s = (*flags)->a = 0;
 
@@ -76,6 +77,7 @@ int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils) {
         char* arg = utils->args[i];
         if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
+            ++(*arg_idx);
             for (int j = 1; arg[j] != '\0'; j++) {
 
                 if (is_flag_found(const_flags, arg[j])) {

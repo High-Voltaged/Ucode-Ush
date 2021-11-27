@@ -25,6 +25,7 @@ int mx_exec(t_cmd_utils* utils) {
 
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
+        mx_printerr("\n");
         exit(1);
     }
     if (pid == 0) {
@@ -34,7 +35,14 @@ int mx_exec(t_cmd_utils* utils) {
         char* utility = paths[0] ? paths[0] : utils->args[0];
         if (execve(utility, utils->args, env_var_array) == -1) {
             
-            mx_print_cmd_err(utils->args[0], strerror(errno));
+            if (errno == ENOENT) {
+                mx_printstr("ush: command not found: ");
+                mx_printerr(utils->args[0]);
+                mx_printerr("\n");
+            } else {
+                mx_print_cmd_err(utils->args[0], strerror(errno));
+                mx_printerr("\n");
+            }
             exit(1);
 
         }

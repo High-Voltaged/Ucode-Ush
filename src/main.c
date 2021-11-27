@@ -2,6 +2,10 @@
 
 void mx_set_shell_vars() {
 
+    if (!getenv(PWD_STR)) {
+        setenv(PWD_STR, getcwd(NULL, 0), 1);
+    }
+
     int shlvl = mx_atoi(getenv("SHLVL"));
     char* shlvl_str = mx_itoa(shlvl + 1);
     setenv("SHLVL", shlvl_str, 1);
@@ -33,11 +37,14 @@ int main() {
     while (1) {
 
         printf("%s", "u$h> ");
-        char* line = mx_read_line();
-        mx_parse_line(utils, line);
-        mx_strdel(&line);
+        char** lines = mx_read_line();
+        for (int i = 0; lines[i] != NULL; ++i) {
 
-        status = mx_exec(utils);
+            mx_parse_line(utils, lines[i]);
+            status = mx_exec(utils);
+
+        }
+        mx_del_strarr(&lines);
 
     }
 
@@ -46,12 +53,5 @@ int main() {
 }
 
 // make prompt go on a newline, if there was none before
-// check `cd -P -` for symlinks & `cd - -P` for error -- output physical dir regardless
-// add output for the result of `cd -`
-// add single quotes for when exported var values contain neither alpha nor digits
-// read_line handling '' ""
-// perror sometimes overwriting prompt
+// echo "cd test ; pwd" | ./ush
 // fix check_odd_quotes
-
-// test on Mac:
-// check for flags which contain digits

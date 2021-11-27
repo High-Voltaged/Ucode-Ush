@@ -45,27 +45,24 @@ static char* replace_cd_arg(const char* sub, const char* to_replace) {
 int mx_cd(t_cmd_utils* utils) {
 
     t_cd_flags* flags = malloc(sizeof(*flags));
-    int arg_idx = mx_cd_parse_flags(&flags, utils);
+    int arg_idx = 1;
+    mx_cd_parse_flags(&flags, utils, &arg_idx);
 
     char* dir_str = NULL;
-    bool is_replaceable = arg_idx > 1 && utils->args[arg_idx] && utils->args[arg_idx + 1];
+    bool is_replaceable = utils->args[arg_idx] && utils->args[arg_idx + 1];
     if (!flags->prev && is_replaceable) {
-        dir_str = replace_cd_arg(utils->args[arg_idx], utils->args[arg_idx + 1]);
 
+        dir_str = replace_cd_arg(utils->args[arg_idx], utils->args[arg_idx + 1]);
         if (!dir_str) return 0;
             
-    } else  if (flags->prev) {
-        
-        dir_str = mx_strdup(getenv(OLDPWD_STR));
-    
-    } else if (flags->P) {
-     
-        dir_str = utils->args[2] ? mx_strdup(utils->args[2]) : mx_strdup(getenv(HOME_STR));
+    } else if (flags->prev) {
+
+        dir_str = getenv(OLDPWD_STR) ? mx_strdup(getenv(OLDPWD_STR)) : mx_strdup(getenv(HOME_STR));
     
     } else {
-     
-        dir_str = utils->args[1] ? mx_strdup(utils->args[1]) : mx_strdup(getenv(HOME_STR));
-    
+
+        dir_str = utils->args[arg_idx] ? mx_strdup(utils->args[arg_idx]) : mx_strdup(getenv(HOME_STR));
+
     }
 
     char* cwd = malloc(sizeof(char) * PATH_MAX);
@@ -77,15 +74,19 @@ int mx_cd(t_cmd_utils* utils) {
     mx_strdel(&cwd);
     
     if (chdir(dir_str) == -1) {
-        mx_print_cmd_err("cd", strerror(errno));
-        printf("%d\n", errno);
+        char* err_str = mx_strdup(strerror(errno));
+        err_str[0] = mx_tolower(err_str[0]);
+        mx_print_cmd_err("cd", err_str);
+        mx_printerr(": ");
+        mx_printerr(dir_str);
+        mx_printerr("\n");
         return 0;
     }
 
     char* curr_wd = malloc(sizeof(char) * PATH_MAX);
     curr_wd = flags->P ? getcwd(curr_wd, PATH_MAX) : mx_normalize_path(path, dir_str);
     
-    if (flags->prev || is_replaceable) {
+    if (/*flags->prev ||*/ is_replaceable) {
         print_tilde_str(curr_wd);
     }
     setenv(PWD_STR, curr_wd, 1);
