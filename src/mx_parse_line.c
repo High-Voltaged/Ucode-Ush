@@ -32,7 +32,7 @@ static int check_odd_quotes(char *str)
     return 0;
 }
 
-static char *replace_substr_free(char *str, char *sub, char *replace)
+char *mx_replace_substr_free(char *str, char *sub, char *replace)
 {
     char *tmp = str;
     char *result = mx_replace_substr(tmp, sub, replace);
@@ -52,11 +52,11 @@ static void handle_backslashes(char **args)
     {
         if (args[i][0] != '\'' && args[i][0] != '"')
         {
-            args[i] = replace_substr_free(args[i], "\\ ", " ");
-            args[i] = replace_substr_free(args[i], "\\`", "`");
-            args[i] = replace_substr_free(args[i], "\\'", "'");
-            args[i] = replace_substr_free(args[i], "\\\"", "\"");
-            args[i] = replace_substr_free(args[i], "\\", "");
+            args[i] = mx_replace_substr_free(args[i], "\\ ", " ");
+            args[i] = mx_replace_substr_free(args[i], "\\`", "`");
+            args[i] = mx_replace_substr_free(args[i], "\\'", "'");
+            args[i] = mx_replace_substr_free(args[i], "\\\"", "\"");
+            args[i] = mx_replace_substr_free(args[i], "\\", "");
         }
     }
 }
@@ -67,8 +67,8 @@ static int handle_tilde(char **args)
     {
         if (args[i][0] == '~')
         {
-            args[i] = replace_substr_free(args[i], "~+", getenv(PWD_STR));
-            args[i] = replace_substr_free(args[i], "~-", getenv(OLDPWD_STR));
+            args[i] = mx_replace_substr_free(args[i], "~+", getenv(PWD_STR));
+            args[i] = mx_replace_substr_free(args[i], "~-", getenv(OLDPWD_STR));
 
             int tilde_index;
             if ((tilde_index = mx_get_char_index(args[i], '~')) != -1)
@@ -116,7 +116,7 @@ static int handle_tilde(char **args)
                 }
                 else
                 {
-                    args[i] = replace_substr_free(args[i], "~", getenv(HOME_STR));
+                    args[i] = mx_replace_substr_free(args[i], "~", getenv(HOME_STR));
                 }
             }
         }
@@ -212,6 +212,7 @@ int mx_parse_line(t_cmd_utils *utils, char *line)
     utils->args[i] = NULL;
 
     handle_backslashes(utils->args);
+    mx_param_expansion(utils->args);  
 
     if (handle_tilde(utils->args) != 0)
         return 1;

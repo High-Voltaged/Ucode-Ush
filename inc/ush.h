@@ -71,6 +71,7 @@ void mx_env_add_flag(t_env_flags** flags, char flag);
 void mx_echo_add_flag(t_echo_flags** flags, char flag);
 void mx_pwd_add_flag(t_pwd_flags **flags, char flag);
 char *mx_normalize_path(char *pwd, char *point);
+void mx_param_expansion(char **args);
 
 // COMMAND EXECUTION
 
@@ -124,6 +125,7 @@ char** mx_get_env_array(t_env_var* list);
 
 char* get_dir_path(char* dir, const char* file_name);
 int mx_util_arg_count(t_cmd_utils* utils);
+char *mx_replace_substr_free(char *str, char *sub, char *replace);
 
 
 // Array of function pointers for commands
