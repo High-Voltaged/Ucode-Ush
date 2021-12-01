@@ -10,10 +10,28 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <unistd.h>
+#include <termios.h>
 #include <signal.h>
 #include <stdio.h>
 
 extern char** environ;
+
+typedef struct s_process {
+    int status;
+    bool stopped;
+    bool completed;
+    pid_t pid;
+    pid_t gpid;
+    char* path;
+    struct s_process* next;
+}              t_process;
+
+// typedef struct s_job {
+//     pid_t gpid;
+//     char* path;
+//     char** args;
+//     struct s_job* next;
+// }              t_job;
 
 typedef struct s_env_var {
     char* name;
@@ -26,6 +44,10 @@ typedef struct s_cmd_utils {
     char** args;
     t_env_var* env_vars;
     t_env_var* exported_vars;
+    t_process* processes;
+    struct termios shell_modes;
+    int shell_pgid;
+    // t_job* 
     // int status;
 }              t_cmd_utils;
 
@@ -75,7 +97,7 @@ void mx_param_expansion(char **args);
 
 // COMMAND EXECUTION
 
-int mx_exec(t_cmd_utils* utils);
+void mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
 int mx_echo(t_cmd_utils* utils);
@@ -126,6 +148,20 @@ char** mx_get_env_array(t_env_var* list);
 char* get_dir_path(char* dir, const char* file_name);
 int mx_util_arg_count(t_cmd_utils* utils);
 char *mx_replace_substr_free(char *str, char *sub, char *replace);
+
+
+// PROCESS CONTROL
+
+t_process *mx_create_process(t_cmd_utils* utils);
+void mx_process_push_back(t_process **list, t_cmd_utils* utils);
+void mx_process_pop_front(t_process **head);
+void mx_process_pop_back(t_process **head);
+void mx_process_pop_index(t_process **head, int index);
+void mx_clear_process_list(t_process **list);
+int mx_process_list_size(t_process* list);
+t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index);
+void mx_print_process_list(t_process* list);
+t_process* mx_top_process(t_process* list);
 
 
 // Array of function pointers for commands

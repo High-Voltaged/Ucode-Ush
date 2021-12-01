@@ -105,6 +105,7 @@ static int handle_tilde(char **args)
                             mx_strdel(&args[i]);
                             args[i] = path;
                         }
+                        closedir(dir);
                     }
                     else
                     {
