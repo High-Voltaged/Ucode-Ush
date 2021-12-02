@@ -1,6 +1,6 @@
 #include "../inc/ush.h"
 
-void mx_signals_init(__sighandler_t handler) {
+void mx_signals_init(sig_t handler) {
 
     signal (SIGINT, handler);
     signal (SIGQUIT, handler);
