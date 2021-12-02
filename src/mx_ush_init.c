@@ -1,6 +1,6 @@
 #include "../inc/ush.h"
 
-void mx_signals_init(__sighandler_t handler) {
+void mx_signals_init(sig_t handler) {
 
     signal (SIGINT, handler);
     signal (SIGQUIT, handler);
@@ -25,7 +25,7 @@ static void set_shell_vars() {
     char* shell_path = realpath("ush", NULL);
     setenv("SHELL", shell_path, 1);
     mx_strdel(&shell_path);
-    setenv("PROMPT", "u$h", 1);
+    // setenv("PROMPT", "u$h", 1);
 
 }
 

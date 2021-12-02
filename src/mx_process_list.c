@@ -182,13 +182,11 @@ t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
 t_process* mx_top_process(t_process* list) {
 
     t_process* current = list;
-    // while (current->next) {
+    while (current->next) {
 
-    //     printf("current inside -- %s & %s\n", current->path, current->next ? current->next->path : "");
-    //     current = current->next;
+        current = current->next;
 
-    // }
-    // printf("current -- %s\n", current->path);
+    }
     return current;
 
 }

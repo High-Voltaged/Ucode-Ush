@@ -22,7 +22,6 @@ int mx_fg(t_cmd_utils* utils) {
 
         printf("processing top\n");
         proc_to_fg = mx_top_process(utils->stopped_jobs);
-        printf("%s -- top process name\n", proc_to_fg->path);
 
     }
     // mx_strdel(&fg_arg);

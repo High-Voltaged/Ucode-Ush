@@ -2,22 +2,16 @@
 
 static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
 
-    static int s_node_id = 1;
     if (pid > 0) {
 
         for (t_process* p = utils->processes; p; p = p->next) {
 
             if (p->pid == pid) {
                 
-                printf("pid found -- %d | %d\n", p->pid, pid);
                 p->status = status;
                 if (WIFSTOPPED (status)) {
                     p->stopped = 1;
                     mx_created_process_push_back(&utils->stopped_jobs, p);
-                    printf("Process list:\n");
-                    mx_print_process_list(utils->processes);
-                    printf("\n\n");
-                    printf("new process -- %s\n", utils->stopped_jobs->path);
                     printf("Process stopped, pid: %d\n", (int)pid);
                 } else {
                     p->completed = 1;
@@ -78,6 +72,7 @@ void mx_wait_for_job(t_cmd_utils* utils) {
         pid = waitpid(-1, &status, WUNTRACED);
         
     }
+    printf("waiting overr -- wait for job\n");
 
 }
 
@@ -89,7 +84,7 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
 
         // tcgetattr (0, &p->sh_modes);
         printf("Continuing the process...\n");
-        tcsetattr(0, TCSADRAIN, &p->sh_modes);
+        // tcsetattr(0, TCSADRAIN, &p->sh_modes);;
         if (kill(- p->pid, SIGCONT) < 0) {
             perror("kill (SIGCONT)");
         }
@@ -97,11 +92,10 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
     }
 
     mx_wait_for_job(utils);
-
     tcsetpgrp (0, utils->shell_pgid);
     printf("terminal passed to shell\n");
 
-    tcgetattr (0, &p->sh_modes);
+    // tcgetattr (0, &p->sh_modes);
     tcsetattr (0, TCSADRAIN, &utils->shell_modes);
 
 }

@@ -166,7 +166,7 @@ t_process* mx_get_process_by_nodeid(t_process* list, int node_id);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils);
-void mx_signals_init(__sighandler_t handler);
+void mx_signals_init(sig_t handler);
 
 
 // Array of function pointers for commands

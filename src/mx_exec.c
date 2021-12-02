@@ -21,7 +21,8 @@ void mx_exec(t_cmd_utils* utils) {
     }
 
     mx_process_push_back(&utils->processes, utils);
-    // mx_print_process_list(utils->processes);
+    printf("process pushed back\n");
+    mx_print_process_list(utils->processes);
 
     pid = fork();
     int status = 0;
@@ -32,9 +33,11 @@ void mx_exec(t_cmd_utils* utils) {
         exit(1);
     }
     
-    t_process* p = mx_top_process(utils->processes);
+    t_process* chld_process = mx_top_process(utils->processes);
+    printf("%s -- child process from top\n", chld_process->path);
     if (pid == 0) {
 
+        // t_process* p = mx_get_process_by_pid(utils->processes, getpid(), NULL);
         if (utils->is_interactive) {
             
             pid_t cpid = getpid();
@@ -44,7 +47,7 @@ void mx_exec(t_cmd_utils* utils) {
         
         }
         char** env_var_array = mx_get_env_array(utils->exported_vars);
-        if (execve(p->path, utils->args, env_var_array) == -1) {
+        if (execve(chld_process->path, utils->args, env_var_array) == -1) {
             
             if (errno == ENOENT) {
                 mx_printstr("ush: command not found: ");
@@ -54,7 +57,7 @@ void mx_exec(t_cmd_utils* utils) {
                 mx_print_cmd_err(utils->args[0], strerror(errno));
                 mx_printerr("\n");
             }
-            p->status = 1;
+            chld_process->status = 1;
             exit(1);
 
         }
@@ -63,7 +66,7 @@ void mx_exec(t_cmd_utils* utils) {
 
     } else {
 
-        p->pid = pid;
+        chld_process->pid = pid;
         if (utils->is_interactive) {
             setpgid(pid, pid);
         }
@@ -73,12 +76,12 @@ void mx_exec(t_cmd_utils* utils) {
     if (!utils->is_interactive)
         mx_wait_for_job(utils);
     else
-        mx_foreground_job(utils, p, 0);
+        mx_foreground_job(utils, chld_process, 0);
 
 //  error processes not getting removed
 
-    if (WIFEXITED(p->status) && WEXITSTATUS(p->status) != 0) {
-        printf("popping process, exit status -- %d\n", p->status);
+    if (WIFEXITED(chld_process->status) && WEXITSTATUS(chld_process->status) != 0) {
+        printf("popping process, exit status -- %d\n", chld_process->status);
         mx_process_pop_back(&utils->processes);
     }
 
