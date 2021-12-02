@@ -5,6 +5,7 @@ t_process *mx_create_process(t_cmd_utils* utils)
     t_process *new_node = malloc(sizeof(t_process));
     
     char** paths = mx_get_exec_paths(utils->args[0], NULL, true);
+    new_node->node_id = 0;
     new_node->stopped = new_node->completed = false;
     new_node->path = paths[0] ? mx_strdup(paths[0]) : mx_strdup(utils->args[0]);
     mx_del_strarr(&paths);
@@ -25,6 +26,30 @@ void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
     while (last->next != NULL) {
         last = last->next;
     } 
+
+    new_node->next = last->next;
+    last->next = new_node;
+
+}
+
+void mx_created_process_push_back(t_process **list, t_process* p) {
+
+    static int s_node_id = 1;
+    t_process* new_node = malloc(sizeof(t_process));
+    new_node->pid = p->pid;
+    new_node->status = p->status;
+    new_node->sh_modes = p->sh_modes;
+    new_node->path = mx_strdup(p->path);
+    new_node->node_id = s_node_id++;
+    if (list != NULL && *list == NULL) {
+        *list = new_node;
+        return;
+    }
+
+    t_process* last = *list;
+    while (last->next != NULL) {
+        last = last->next;
+    }
 
     new_node->next = last->next;
     last->next = new_node;
@@ -102,7 +127,6 @@ void mx_process_pop_index(t_process **list, int index) {
 
 }
 
-
 void mx_clear_process_list(t_process **list)
 {
     if (list == NULL || *list == NULL)
@@ -137,7 +161,6 @@ int mx_process_list_size(t_process* list) {
 
 }
 
-
 t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
 
     t_process* current = list;
@@ -159,12 +182,42 @@ t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
 t_process* mx_top_process(t_process* list) {
 
     t_process* current = list;
+    // while (current->next) {
+
+    //     printf("current inside -- %s & %s\n", current->path, current->next ? current->next->path : "");
+    //     current = current->next;
+
+    // }
+    // printf("current -- %s\n", current->path);
+    return current;
+
+}
+
+t_process* mx_get_process_by_nodeid(t_process* list, int node_id) {
+
+    t_process* current = list;
     while (current->next) {
 
+        if (current->node_id == node_id)
+            return current;
         current = current->next;
 
     }
-    return current;
+    return NULL;
+
+}
+
+t_process* mx_get_process_by_name(t_process* list, const char* name) {
+
+    t_process* current = list;
+    while (current->next) {
+
+        if (mx_strcmp(current->path, name) == 0)
+            return current;
+        current = current->next;
+
+    }
+    return NULL;
 
 }
 

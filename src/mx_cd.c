@@ -71,7 +71,7 @@ int mx_cd(t_cmd_utils* utils) {
     cwd = flags->P ? cwd : mx_normalize_path(path, getenv(PWD_STR));
 
     setenv(OLDPWD_STR, cwd, 1);
-    mx_strdel(&cwd);
+    free(cwd);
     
     if (chdir(dir_str) == -1) {
         char* err_str = mx_strdup(strerror(errno));
@@ -80,6 +80,7 @@ int mx_cd(t_cmd_utils* utils) {
         mx_printerr(": ");
         mx_printerr(dir_str);
         mx_printerr("\n");
+        mx_strdel(&err_str);
         return 0;
     }
 
@@ -91,7 +92,7 @@ int mx_cd(t_cmd_utils* utils) {
     }
     setenv(PWD_STR, curr_wd, 1);
     
-    mx_strdel(&curr_wd);
+    free(curr_wd);
     mx_strdel(&dir_str);
     mx_strdel(&path);
     free(flags);
