@@ -20,18 +20,13 @@ typedef struct s_process {
     int status;
     bool stopped;
     bool completed;
+    
     pid_t pid;
-    pid_t gpid;
+    int node_id;
     char* path;
+    struct termios sh_modes;
     struct s_process* next;
 }              t_process;
-
-// typedef struct s_job {
-//     pid_t gpid;
-//     char* path;
-//     char** args;
-//     struct s_job* next;
-// }              t_job;
 
 typedef struct s_env_var {
     char* name;
@@ -45,9 +40,10 @@ typedef struct s_cmd_utils {
     t_env_var* env_vars;
     t_env_var* exported_vars;
     t_process* processes;
+    struct s_process* stopped_jobs;
     struct termios shell_modes;
     int shell_pgid;
-    // t_job* 
+    bool is_interactive;
     // int status;
 }              t_cmd_utils;
 
@@ -105,6 +101,7 @@ int mx_which(t_cmd_utils* utils);
 int mx_pwd(t_cmd_utils* utils);
 int mx_export(t_cmd_utils* utils);
 int mx_unset(t_cmd_utils* utils);
+int mx_fg(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
 
 // ERROR HANDLING
@@ -148,12 +145,14 @@ char** mx_get_env_array(t_env_var* list);
 char* get_dir_path(char* dir, const char* file_name);
 int mx_util_arg_count(t_cmd_utils* utils);
 char *mx_replace_substr_free(char *str, char *sub, char *replace);
+void mx_ush_init(t_cmd_utils** utils);
 
 
 // PROCESS CONTROL
 
 t_process *mx_create_process(t_cmd_utils* utils);
 void mx_process_push_back(t_process **list, t_cmd_utils* utils);
+void mx_created_process_push_back(t_process **list, t_process* p);
 void mx_process_pop_front(t_process **head);
 void mx_process_pop_back(t_process **head);
 void mx_process_pop_index(t_process **head, int index);
@@ -162,11 +161,17 @@ int mx_process_list_size(t_process* list);
 t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index);
 void mx_print_process_list(t_process* list);
 t_process* mx_top_process(t_process* list);
+t_process* mx_get_process_by_name(t_process* list, const char* name);
+t_process* mx_get_process_by_nodeid(t_process* list, int node_id);
+void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
+void mx_background_job(t_process* p, bool to_continue);
+void mx_wait_for_job(t_cmd_utils* utils);
+void mx_signals_init(__sighandler_t handler);
 
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
-    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_export, &mx_unset, &mx_exit, NULL 
+    &mx_cd, &mx_env, &mx_echo, &mx_pwd, &mx_which, &mx_export, &mx_unset, &mx_fg, &mx_exit, NULL 
 };
 
 #endif

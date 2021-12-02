@@ -44,6 +44,7 @@ int mx_pwd(t_cmd_utils* utils)
         realpath(getenv(PWD_STR), cwd) ? print_pwd(cwd) : (void) 0; // if env clear PWD wariable?
 
     }
+    free(flags);
 
     return 0;
 }
