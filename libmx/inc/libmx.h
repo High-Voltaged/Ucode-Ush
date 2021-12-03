@@ -92,12 +92,12 @@ void *mx_memmove(void *dst, const void *src, size_t len);
 void *mx_realloc(void *ptr, size_t size);
 
 //list pack
-t_list *mx_create_node(void *data);
-void mx_push_back(t_list **list, void *data);
-void mx_pop_back(t_list **list);
-void mx_clear_list(t_list **list);
-int mx_list_size(t_list* list);
-void mx_print_list(t_list* list);
-t_list *mx_sort_list(t_list *lst, bool (*cmp)(void *a, void *b));
+// t_list *mx_create_node(void *data);
+// void mx_push_back(t_list **list, void *data);
+// void mx_pop_back(t_list **list);
+// void mx_clear_list(t_list **list);
+// int mx_list_size(t_list* list);
+// void mx_print_list(t_list* list);
+// t_list *mx_sort_list(t_list *lst, bool (*cmp)(void *a, void *b));
 
 #endif

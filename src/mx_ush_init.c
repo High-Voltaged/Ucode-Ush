@@ -22,10 +22,9 @@ static void set_shell_vars() {
     setenv("SHLVL", shlvl_str, 1);
     mx_strdel(&shlvl_str);
 
-    char* shell_path = realpath("ush", NULL);
-    setenv("SHELL", shell_path, 1);
-    mx_strdel(&shell_path);
-    // setenv("PROMPT", "u$h", 1);
+    // char* shell_path = realpath("ush", NULL);
+    // setenv("SHELL", shell_path, 1);
+    // mx_strdel(&shell_path);
 
 }
 

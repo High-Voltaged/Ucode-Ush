@@ -42,6 +42,20 @@ static char* replace_cd_arg(const char* sub, const char* to_replace) {
 
 }
 
+static void overwrite_pwd_vars(t_cmd_utils* utils) {
+
+    t_env_var* exported_pwd = mx_find_env_var(utils->exported_vars, (char*)PWD_STR, NULL);
+    t_env_var* exported_oldpwd = mx_find_env_var(utils->exported_vars, (char*)OLDPWD_STR, NULL);
+    t_env_var* env_pwd = mx_find_env_var(utils->env_vars, (char*)PWD_STR, NULL);
+    t_env_var* env_oldpwd = mx_find_env_var(utils->env_vars, (char*)OLDPWD_STR, NULL);
+    
+    mx_overwrite_env_var(&exported_pwd, getenv(PWD_STR));
+    mx_overwrite_env_var(&exported_oldpwd, getenv(OLDPWD_STR));
+    mx_overwrite_env_var(&env_pwd, getenv(PWD_STR));
+    mx_overwrite_env_var(&env_oldpwd, getenv(OLDPWD_STR));
+
+}
+
 int mx_cd(t_cmd_utils* utils) {
 
     t_cd_flags* flags = malloc(sizeof(*flags));
@@ -96,8 +110,8 @@ int mx_cd(t_cmd_utils* utils) {
     mx_strdel(&dir_str);
     mx_strdel(&path);
     free(flags);
-    mx_env_reset(&utils);
-    // mx_export_reset(&utils);
+    overwrite_pwd_vars(utils);
+    
     return 0;
 
 }

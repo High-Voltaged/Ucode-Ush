@@ -31,9 +31,8 @@ t_process *mx_process_dup(t_process* src, int node_id) {
 
 }
 
-void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
+static void mx_push_back(t_process** list, t_process* new_node) {
 
-    t_process* new_node = mx_create_process(utils);
     if (list != NULL && *list == NULL) {
         *list = new_node;
         return;
@@ -49,22 +48,18 @@ void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
 
 }
 
+void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
+
+    t_process* new_node = mx_create_process(utils);
+    mx_push_back(list, new_node);
+
+}
+
 void mx_created_process_push_back(t_process **list, t_process* p) {
 
     int s_node_id = mx_process_list_size(*list) + 1;
     t_process* new_node = mx_process_dup(p, s_node_id);
-    if (list != NULL && *list == NULL) {
-        *list = new_node;
-        return;
-    }
-
-    t_process* last = *list;
-    while (last->next != NULL) {
-        last = last->next;
-    }
-
-    new_node->next = last->next;
-    last->next = new_node;
+    mx_push_back(list, new_node);
 
 }
 

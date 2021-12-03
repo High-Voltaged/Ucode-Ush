@@ -21,7 +21,7 @@ void mx_exec(t_cmd_utils* utils) {
     }
 
     mx_process_push_back(&utils->processes, utils);
-    // mx_print_process_list(utils->processes);
+    mx_print_process_list(utils->processes);
 
     pid = fork();
 
