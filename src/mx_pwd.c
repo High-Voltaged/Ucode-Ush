@@ -36,13 +36,11 @@ int mx_pwd(t_cmd_utils* utils)
     {
         char *cwd = NULL;
         (cwd = getenv(PWD_STR)) ? print_pwd(cwd) : (void) 0;
-
     }
     else if (flags->P)
     {
         char cwd[PATH_MAX];
-        realpath(getenv(PWD_STR), cwd) ? print_pwd(cwd) : (void) 0; // if env clear PWD wariable?
-
+        realpath(getenv(PWD_STR), cwd) ? print_pwd(cwd) : (void) 0; // if env clear PWD variable?
     }
     free(flags);
 
