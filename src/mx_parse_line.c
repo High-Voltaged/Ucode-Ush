@@ -79,6 +79,29 @@ static void del_extra_quotes(char **args)
     }
 }
 
+int get_close_parenthesis_idx(char *str)
+{
+    int count_parenthesis = 1;
+
+    for (int i = 2; str[i] != '\0'; i++)
+    {
+        if (str[i] == '$' && str[i + 1] == '(')
+        {
+            count_parenthesis++;
+        }
+        if (str[i] == ')')
+        {
+            count_parenthesis--;
+        }
+        if (count_parenthesis == 0)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 int mx_parse_line(t_cmd_utils *utils, char *line)
 {
     char *mod_line = mx_strtrim(line);
@@ -131,6 +154,18 @@ int mx_parse_line(t_cmd_utils *utils, char *line)
             utils->args[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\'') + 2);
             tmp += mx_get_char_index(mod_line + 1, '\'') + 2;
         }
+        else if (mod_line[0] == '$' && mod_line[1] == '(')
+        {
+            int close_parenthesis_idx = get_close_parenthesis_idx(mod_line);
+            if (close_parenthesis_idx == -1)
+            {
+                mx_printerr("Odd number of quotes)))))))))))).\n");
+                
+            }
+            
+            utils->args[i] = mx_strndup(mod_line, close_parenthesis_idx + 1);
+            tmp += close_parenthesis_idx + 1;
+        }
         else
         {
             tmp += space_index + 1;
@@ -153,6 +188,7 @@ int mx_parse_line(t_cmd_utils *utils, char *line)
     if (mx_tilde_expansion(utils->args) != 0)
         return 1;
 
+    mx_command_substitution(utils->args);
     del_extra_quotes(utils->args);
 
     return 0;
