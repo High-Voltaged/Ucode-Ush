@@ -7,7 +7,7 @@ int main() {
 
     while (1) {
 
-        printf("%s", "u$h> ");
+        mx_printstr("u$h> ");
         char** lines = mx_read_line();
         for (int i = 0; lines[i] != NULL; ++i) {
 

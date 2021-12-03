@@ -8,10 +8,27 @@ t_process *mx_create_process(t_cmd_utils* utils)
     new_node->node_id = 0;
     new_node->stopped = new_node->completed = false;
     new_node->path = paths[0] ? mx_strdup(paths[0]) : mx_strdup(utils->args[0]);
+    new_node->cmd_name = mx_strdup(utils->args[0]);
     mx_del_strarr(&paths);
     
     new_node->next = NULL;
     return new_node;
+}
+
+t_process *mx_process_dup(t_process* src, int node_id) {
+
+    t_process* p_dup = malloc(sizeof(t_process));
+    p_dup->pid = src->pid;
+    p_dup->status = src->status;
+    p_dup->sh_modes = src->sh_modes;
+    p_dup->path = mx_strdup(src->path);
+    p_dup->cmd_name = mx_strdup(src->cmd_name);
+    p_dup->stopped = src->stopped;
+    p_dup->completed = src->completed;
+    p_dup->node_id = node_id;
+    p_dup->next = NULL;
+    return p_dup;
+
 }
 
 void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
@@ -34,13 +51,8 @@ void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
 
 void mx_created_process_push_back(t_process **list, t_process* p) {
 
-    static int s_node_id = 1;
-    t_process* new_node = malloc(sizeof(t_process));
-    new_node->pid = p->pid;
-    new_node->status = p->status;
-    new_node->sh_modes = p->sh_modes;
-    new_node->path = mx_strdup(p->path);
-    new_node->node_id = s_node_id++;
+    int s_node_id = mx_process_list_size(*list) + 1;
+    t_process* new_node = mx_process_dup(p, s_node_id);
     if (list != NULL && *list == NULL) {
         *list = new_node;
         return;
@@ -75,6 +87,7 @@ void mx_process_pop_front(t_process **head) {
 void mx_clear_process(t_process** p) {
 
     mx_strdel(&(*p)->path);
+    mx_strdel(&(*p)->cmd_name);
     free(*p);
     *p = NULL;
 
@@ -161,29 +174,35 @@ int mx_process_list_size(t_process* list) {
 
 }
 
-t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
+// t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
 
+//     t_process* current = list;
+//     int i = 0;
+//     while (current) {
+
+//         if (index != NULL)
+//             *index = i++;
+
+//         if (current->pid == pid)   
+//             return current;
+//         current = current->next;
+
+//     }
+//     return NULL;
+
+// }
+
+t_process* mx_top_process(t_process* list, int* index) {
+    
+    if (list == NULL)
+        return NULL;
+
+    int i = 1;
     t_process* current = list;
-    int i = 0;
-    while (current) {
+    while (current->next != NULL) {
 
-        if (index != NULL)
+        if (index)
             *index = i++;
-
-        if (current->pid == pid)   
-            return current;
-        current = current->next;
-
-    }
-    return NULL;
-
-}
-
-t_process* mx_top_process(t_process* list) {
-
-    t_process* current = list;
-    while (current->next) {
-
         current = current->next;
 
     }
@@ -191,11 +210,14 @@ t_process* mx_top_process(t_process* list) {
 
 }
 
-t_process* mx_get_process_by_nodeid(t_process* list, int node_id) {
+t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index) {
 
     t_process* current = list;
-    while (current->next) {
+    int i = 0;
+    while (current) {
 
+        if (index)
+            *index = i++;
         if (current->node_id == node_id)
             return current;
         current = current->next;
@@ -205,12 +227,15 @@ t_process* mx_get_process_by_nodeid(t_process* list, int node_id) {
 
 }
 
-t_process* mx_get_process_by_name(t_process* list, const char* name) {
+t_process* mx_get_process_by_name(t_process* list, const char* name, int* index) {
 
     t_process* current = list;
-    while (current->next) {
+    int i = 0;
+    while (current) {
 
-        if (mx_strcmp(current->path, name) == 0)
+        if (index)
+            *index = i++;
+        if (mx_strcmp(current->cmd_name, name) == 0)
             return current;
         current = current->next;
 

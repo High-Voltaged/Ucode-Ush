@@ -21,11 +21,9 @@ void mx_exec(t_cmd_utils* utils) {
     }
 
     mx_process_push_back(&utils->processes, utils);
-    printf("process pushed back\n");
-    mx_print_process_list(utils->processes);
+    // mx_print_process_list(utils->processes);
 
     pid = fork();
-    int status = 0;
 
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
@@ -33,11 +31,9 @@ void mx_exec(t_cmd_utils* utils) {
         exit(1);
     }
     
-    t_process* chld_process = mx_top_process(utils->processes);
-    printf("%s -- child process from top\n", chld_process->path);
+    t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == 0) {
 
-        // t_process* p = mx_get_process_by_pid(utils->processes, getpid(), NULL);
         if (utils->is_interactive) {
             
             pid_t cpid = getpid();
@@ -74,7 +70,7 @@ void mx_exec(t_cmd_utils* utils) {
     }
 
     if (!utils->is_interactive)
-        mx_wait_for_job(utils);
+        mx_wait_for_job(utils, chld_process);
     else
         mx_foreground_job(utils, chld_process, 0);
 

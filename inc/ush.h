@@ -24,6 +24,7 @@ typedef struct s_process {
     pid_t pid;
     int node_id;
     char* path;
+    char* cmd_name;
     struct termios sh_modes;
     struct s_process* next;
 }              t_process;
@@ -161,13 +162,13 @@ void mx_clear_process_list(t_process **list);
 int mx_process_list_size(t_process* list);
 t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index);
 void mx_print_process_list(t_process* list);
-t_process* mx_top_process(t_process* list);
-t_process* mx_get_process_by_name(t_process* list, const char* name);
-t_process* mx_get_process_by_nodeid(t_process* list, int node_id);
+t_process* mx_top_process(t_process* list, int* index);
+t_process* mx_get_process_by_name(t_process* list, const char* name, int* index);
+t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
-void mx_wait_for_job(t_cmd_utils* utils);
-void mx_signals_init(sig_t handler);
+void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
+void mx_signals_init(__sighandler_t handler);
 
 
 // Array of function pointers for commands
