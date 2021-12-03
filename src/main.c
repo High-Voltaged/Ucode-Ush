@@ -26,4 +26,3 @@ int main() {
 }
 
 // echo "cd test ; pwd" | ./ush
-// fix check_odd_quotes

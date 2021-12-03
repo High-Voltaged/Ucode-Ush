@@ -92,7 +92,7 @@ void *mx_memmove(void *dst, const void *src, size_t len);
 void *mx_realloc(void *ptr, size_t size);
 
 //list pack
-// t_list *mx_create_node(void *data);
+t_list *mx_create_node(void *data);
 // void mx_push_back(t_list **list, void *data);
 // void mx_pop_back(t_list **list);
 // void mx_clear_list(t_list **list);
