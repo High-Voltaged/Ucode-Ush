@@ -15,6 +15,7 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
                     mx_printstr("\nush: suspended  ");
                     mx_print_strarr(utils->args, " ");
                 } else {
+                    p->stopped = false;
                     p->completed = true;
                 }
                 return 0;
@@ -31,6 +32,15 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
         return -1;
     }
 
+}
+
+void update_status (t_cmd_utils* utils) {
+
+    int status;
+    pid_t pid;
+    do
+        pid = waitpid (-1, &status, WUNTRACED | WNOHANG);
+    while (!set_process_status (utils, pid, status));
 }
 
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p) {
@@ -51,9 +61,7 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
 
     if (to_continue) {
 
-        // tcgetattr (0, &p->sh_modes);
         printf("[%d] - continued  %s\n", p->node_id, p->cmd_name);
-        // tcsetattr(0, TCSADRAIN, &p->sh_modes);;
         if (kill(- p->pid, SIGCONT) < 0) {
             perror("kill (SIGCONT)");
         }
@@ -61,9 +69,9 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
     }
 
     mx_wait_for_job(utils, p);
+    update_status(utils);
     tcsetpgrp (0, utils->shell_pgid);
 
-    // tcgetattr (0, &p->sh_modes);
     tcsetattr (0, TCSADRAIN, &utils->shell_modes);
 
 }

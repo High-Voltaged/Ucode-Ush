@@ -174,23 +174,23 @@ int mx_process_list_size(t_process* list) {
 
 }
 
-// t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
+t_process* mx_get_process_by_pid(t_process* list, pid_t pid, int* index) {
 
-//     t_process* current = list;
-//     int i = 0;
-//     while (current) {
+    t_process* current = list;
+    int i = 0;
+    while (current) {
 
-//         if (index != NULL)
-//             *index = i++;
+        if (index != NULL)
+            *index = i++;
 
-//         if (current->pid == pid)   
-//             return current;
-//         current = current->next;
+        if (current->pid == pid)   
+            return current;
+        current = current->next;
 
-//     }
-//     return NULL;
+    }
+    return NULL;
 
-// }
+}
 
 t_process* mx_top_process(t_process* list, int* index) {
     

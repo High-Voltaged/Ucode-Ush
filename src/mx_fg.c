@@ -24,7 +24,6 @@ int mx_fg(t_cmd_utils* utils) {
     int proc_idx = 0;
     if (mx_strlen(fg_arg) == 2 && mx_isdigit(fg_arg[1])) {
 
-        printf("processing for nodeid\n");
         proc_to_fg = mx_get_process_by_nodeid(utils->stopped_jobs, mx_atoi(fg_arg + 1), &proc_idx);
         if (proc_to_fg == NULL) {
             fg_no_job_err(fg_arg);
@@ -34,7 +33,6 @@ int mx_fg(t_cmd_utils* utils) {
 
     } else if (mx_strlen(fg_arg) > 0 && fg_arg[0] != '%') {
 
-        printf("processing for name\n");
         proc_to_fg = mx_get_process_by_name(utils->stopped_jobs, fg_arg, &proc_idx);
         if (proc_to_fg == NULL) {
             fg_not_found_err(fg_arg);
@@ -43,7 +41,6 @@ int mx_fg(t_cmd_utils* utils) {
         }
 
     } else {
-
         
         proc_to_fg = mx_top_process(utils->stopped_jobs, &proc_idx);
         if (proc_to_fg == NULL) {
@@ -54,7 +51,8 @@ int mx_fg(t_cmd_utils* utils) {
     }
     mx_strdel(&fg_arg);
 
-    mx_foreground_job(utils, proc_to_fg, 1);
+    t_process* original = mx_get_process_by_pid(utils->processes, proc_to_fg->pid, NULL);
+    mx_foreground_job(utils, original, 1);
     mx_process_pop_index(&utils->stopped_jobs, proc_idx);
     return 0;
 
