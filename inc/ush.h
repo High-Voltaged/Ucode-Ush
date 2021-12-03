@@ -92,6 +92,7 @@ void mx_pwd_add_flag(t_pwd_flags **flags, char flag);
 char *mx_normalize_path(char *pwd, char *point);
 int mx_tilde_expansion(char **args);
 void mx_param_expansion(char **args);
+void mx_command_substitution(char **args);
 
 // COMMAND EXECUTION
 

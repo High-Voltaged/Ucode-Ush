@@ -48,7 +48,7 @@ void mx_param_expansion(char **args)
 
         while ((dollar_pos = mx_get_char_index(tmp, '$')) != -1)
         {
-            if (dollar_pos != -1 && !mx_isspace(tmp[dollar_pos + 1]) && tmp[dollar_pos + 1] != '\\')
+            if (dollar_pos != -1 && !mx_isspace(tmp[dollar_pos + 1]) && tmp[dollar_pos + 1] != '(' && tmp[dollar_pos + 1] != '\\')
             {
                 if (tmp[dollar_pos + 1] == '{')
                 {
@@ -78,7 +78,7 @@ void mx_param_expansion(char **args)
                 mx_strdel(&to_replace);
             }
 
-            tmp += dollar_pos + 1;
+            tmp += dollar_pos + 1;// if str includes single $ 
         }
         mx_strdel(&dup_arg);
     }
