@@ -35,16 +35,16 @@ static bool is_only_flags(const char* flags, char* flags_str) {
     return true;
 }
 
-void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils, int* arg_idx) {
+void mx_cd_parse_flags(t_cd_flags** flags, char** args, int* arg_idx) {
 
     (*flags)->P = (*flags)->prev = (*flags)->s = 0;
 
-    if (utils->args == NULL) return;
+    if (args == NULL) return;
     const char* const_flags = "sP";
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (int i = 1; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
-        if (arg[0] == '-' && mx_strlen(arg) == 1 && !utils->args[i + 1]) {
+        char* arg = args[i];
+        if (arg[0] == '-' && mx_strlen(arg) == 1 && !args[i + 1]) {
             mx_cd_add_flag(flags, arg[0]);
             ++(*arg_idx);
             continue;
@@ -65,16 +65,16 @@ void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
 }
 
-int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils, int* arg_idx) {
+int mx_wch_parse_flags(t_wch_flags** flags, char** args, int* arg_idx) {
 
     (*flags)->s = (*flags)->a = 0;
 
-    if (utils->args == NULL) return 0;
+    if (args == NULL) return 0;
 
     const char* const_flags = "sa";
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (int i = 1; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
+        char* arg = args[i];
         if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             ++(*arg_idx);
@@ -95,17 +95,17 @@ int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
 }
 
-int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
+int mx_env_parse_flags(t_env_flags** flags, char** args, int* arg_idx) {
 
     (*flags)->i = (*flags)->P = (*flags)->u = 0;
     (*flags)->u_param = (*flags)->p_param = NULL;
 
-    if (utils->args == NULL) return 0;
+    if (args == NULL) return 0;
     const char* const_flags = "iPu";
 
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (int i = 1; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
+        char* arg = args[i];
         if (mx_strstr(arg, "=") == NULL) {
             if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
@@ -118,8 +118,8 @@ int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
                         mx_env_add_flag(flags, arg[j]);
                         if (arg[j] == 'u') {
 
-                            if (utils->args[i + 1] != NULL && j == flag_count - 1) {
-                                (*flags)->u_param = mx_strdup(utils->args[i + 1]);
+                            if (args[i + 1] != NULL && j == flag_count - 1) {
+                                (*flags)->u_param = mx_strdup(args[i + 1]);
                                 ++(*arg_idx);
                             } else if (j == flag_count - 1) {
                                 mx_print_env_arg_err(arg[j]);
@@ -128,8 +128,8 @@ int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
 
                         } else if (arg[j] == 'P') {
 
-                            if (utils->args[i + 1] != NULL && j == flag_count - 1) {
-                                (*flags)->p_param = mx_strdup(utils->args[i + 1]);
+                            if (args[i + 1] != NULL && j == flag_count - 1) {
+                                (*flags)->p_param = mx_strdup(args[i + 1]);
                                 ++(*arg_idx);
                             } else if (j == flag_count - 1) {
                                 mx_print_env_arg_err(arg[j]);
@@ -150,18 +150,18 @@ int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx) {
     return 0;
 }
 
-void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count) {
+void mx_echo_parse_flags(t_echo_flags** flags, char** args, int *flag_count) {
 
     (*flags)->n = (*flags)->E = 0;
     (*flags)->e = 1;
     // (*flags)->E = 1; //default
 
-    if (utils->args == NULL) return;
+    if (args == NULL) return;
 
     const char* const_flags = "neE";
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (int i = 1; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
+        char* arg = args[i];
         if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             if (!is_only_flags(const_flags, arg))
@@ -177,17 +177,17 @@ void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_cou
 
 }
 
-int mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils) {
+int mx_pwd_parse_flags(t_pwd_flags** flags, char** args) {
 
     (*flags)->L = 1;
     (*flags)->P = 0;
 
-    if (utils->args == NULL) return 0;
+    if (args == NULL) return 0;
 
     const char* const_flags = "LP";
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (int i = 1; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
+        char* arg = args[i];
 
         if (arg[0] != '-')
         {
@@ -214,13 +214,13 @@ int mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils) {
 
 }
 
-int mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd) {
+int mx_parse_for_no_flags(char** args, const char* cmd) {
 
-    if (utils->args == NULL) return 0;
+    if (args == NULL) return 0;
 
-    for (int i = 1; utils->args[i] != NULL; ++i) {
+    for (int i = 1; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
+        char* arg = args[i];
         if ((arg[0] == '-') && !mx_isspace(arg[1])) {
 
             mx_print_flag_err(cmd, arg[1]);

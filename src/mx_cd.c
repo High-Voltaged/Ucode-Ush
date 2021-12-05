@@ -56,18 +56,18 @@ static void overwrite_pwd_vars(t_cmd_utils* utils) {
 
 }
 
-int mx_cd(t_cmd_utils* utils) {
+int mx_cd(t_cmd_utils* utils, char** args) {
 
     t_cd_flags* flags = malloc(sizeof(*flags));
     int arg_idx = 1;
-    mx_cd_parse_flags(&flags, utils, &arg_idx);
+    mx_cd_parse_flags(&flags, args, &arg_idx);
 
 
     char* dir_str = NULL;
-    bool is_replaceable = utils->args[arg_idx] && utils->args[arg_idx + 1];
+    bool is_replaceable = args[arg_idx] && args[arg_idx + 1];
     if (!flags->prev && is_replaceable) {
 
-        dir_str = replace_cd_arg(utils->args[arg_idx], utils->args[arg_idx + 1]);
+        dir_str = replace_cd_arg(args[arg_idx], args[arg_idx + 1]);
         if (!dir_str) return 0;
             
     } else if (flags->prev) {
@@ -76,7 +76,7 @@ int mx_cd(t_cmd_utils* utils) {
     
     } else {
 
-        dir_str = utils->args[arg_idx] ? mx_strdup(utils->args[arg_idx]) : mx_strdup(getenv(HOME_STR));
+        dir_str = args[arg_idx] ? mx_strdup(args[arg_idx]) : mx_strdup(getenv(HOME_STR));
 
     }
 

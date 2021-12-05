@@ -63,9 +63,9 @@ void mx_created_process_push_back(t_process **list, t_process* p) {
 
 }
 
-void mx_process_exit(t_cmd_utils* utils, int exit_code) {
+void mx_process_exit(t_cmd_utils* utils, char** args, int exit_code) {
 
-    mx_cleanup(utils);
+    mx_cleanup(utils, args);
     exit(exit_code);
 
 }

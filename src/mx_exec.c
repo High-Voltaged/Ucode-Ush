@@ -1,11 +1,11 @@
 #include "../inc/ush.h"
 
-int mx_builtin_exec(t_cmd_utils* utils) {
+int mx_builtin_exec(t_cmd_utils* utils, char** args) {
     
     for (int i = 0; builtin_cmds[i] != NULL; ++i) {
 
         if (mx_strcmp(utils->args[0], builtin_cmds[i]) == 0) {
-            return (builtin_funcs[i])(utils);
+            return (builtin_funcs[i])(utils, args);
         }
 
     }
@@ -16,7 +16,7 @@ int mx_builtin_exec(t_cmd_utils* utils) {
 void mx_exec(t_cmd_utils* utils) {
 
     pid_t pid;
-    if (utils->args[0] == NULL || mx_builtin_exec(utils) == 0) {
+    if (utils->args[0] == NULL || mx_builtin_exec(utils, utils->args) == 0) {
         return;
     }
 
@@ -29,7 +29,7 @@ void mx_exec(t_cmd_utils* utils) {
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        mx_process_exit(utils, EXIT_FAILURE);
+        mx_process_exit(utils, utils->args, EXIT_FAILURE);
     }
     
     if (pid == 0) {
@@ -53,11 +53,10 @@ void mx_exec(t_cmd_utils* utils) {
                 mx_print_cmd_err(utils->args[0], strerror(errno));
                 mx_printerr("\n");
             }
-            mx_process_exit(utils, MX_EXIT_ENOENT);
+            mx_process_exit(utils, utils->args, MX_EXIT_ENOENT);
 
         }
         mx_del_strarr(&env_var_array);
-        // mx_process_exit(utils, EXIT_SUCCESS);
 
     } else {
 

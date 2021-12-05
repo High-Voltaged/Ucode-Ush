@@ -37,16 +37,16 @@ static bool is_builtin_cmd(const char* cmd) {
 
 }
 
-int mx_which(t_cmd_utils* utils) {
+int mx_which(t_cmd_utils* utils, char** args) {
 
     t_wch_flags* flags = malloc(sizeof(*flags));
     int arg_idx = 1;
-    if (mx_wch_parse_flags(&flags, utils, &arg_idx) != 0)
+    if (mx_wch_parse_flags(&flags, args, &arg_idx) != 0)
         return 0;
 
-    for (int i = arg_idx; utils->args[i] != NULL; ++i) {
+    for (int i = arg_idx; args[i] != NULL; ++i) {
 
-        char* to_find = utils->args[i];
+        char* to_find = args[i];
         if (is_builtin_cmd(to_find)) {
             mx_printerr(to_find);
             mx_printerr(": shell built-in command\n");

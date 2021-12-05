@@ -21,11 +21,11 @@ void mx_env_add_flag(t_env_flags** flags, char flag) {
 
 }
 
-void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx) {
+void mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx) {
 
-    for (int i = *arg_idx; utils->args[i] != NULL; ++i) {
+    for (int i = *arg_idx; args[i] != NULL; ++i) {
 
-        char* arg = utils->args[i];
+        char* arg = args[i];
         if (mx_strstr(arg, "=") != NULL) {
             char* var_name = mx_get_var_name(arg);
             t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
@@ -69,18 +69,18 @@ int mx_remove_env_var(t_cmd_utils** utils, char* name) {
 
 }
 
-int mx_env(t_cmd_utils* utils) {
+int mx_env(t_cmd_utils* utils, char** args) {
 
     int curr_arg_idx = 1;
     t_env_flags* flags = malloc(sizeof(*flags));
-    if (mx_env_parse_flags(&flags, utils, &curr_arg_idx) != 0)
+    if (mx_env_parse_flags(&flags, args, &curr_arg_idx) != 0)
         return 0;
 
-    if (utils->args[1] != NULL) {
+    if (args[1] != NULL) {
 
-        if (utils->args[curr_arg_idx]) {
+        if (args[curr_arg_idx]) {
 
-            mx_exec_env_utility(utils, curr_arg_idx, flags);
+            mx_exec_env_utility(utils, args, curr_arg_idx, flags);
 
         }
 

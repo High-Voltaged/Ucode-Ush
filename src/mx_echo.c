@@ -213,16 +213,16 @@ static void out_echo_E(char *str)
     }
 }
 
-int mx_echo(t_cmd_utils *utils)
+int mx_echo(t_cmd_utils *utils, char** args)
 {
     int flag_count = 0;
     t_echo_flags *flags = malloc(sizeof(*flags));
-    mx_echo_parse_flags(&flags, utils, &flag_count);
+    mx_echo_parse_flags(&flags, args, &flag_count);
 
-    for (int i = 1 + flag_count; utils->args[i]; i++)
+    for (int i = 1 + flag_count; args[i]; i++)
     {
-        flags->e ? out_echo_e(utils->args[i]) : out_echo_E(utils->args[i]);
-        utils->args[i + 1] ? mx_printstr(" ") : (void)0;
+        flags->e ? out_echo_e(args[i]) : out_echo_E(args[i]);
+        args[i + 1] ? mx_printstr(" ") : (void)0;
     }
 
     flags->n ? (void)0 : mx_printstr("\n"); //on linux extra(on Linux it is absent at all) \n if \\c in str

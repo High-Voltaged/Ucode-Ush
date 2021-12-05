@@ -16,9 +16,9 @@ static void fg_no_job_err(const char* arg) {
 
 }
 
-int mx_fg(t_cmd_utils* utils) {
+int mx_fg(t_cmd_utils* utils, char** args) {
 
-    char* fg_arg = utils->args[1] ? mx_strdup(utils->args[1]) : mx_strdup("");
+    char* fg_arg = args[1] ? mx_strdup(args[1]) : mx_strdup("");
 
     t_process* proc_to_fg = NULL;
     int proc_idx = 0;

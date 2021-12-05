@@ -1,16 +1,16 @@
 #include "../inc/ush.h"
 
 // Get arguments for the utility to be executed
-char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx) {
+char** mx_get_env_util_args(t_cmd_utils* utils, char** args, int util_arg_idx) {
 
     int arg_count = 1;
-    for (int i = util_arg_idx; utils->args[i] != NULL; ++arg_count, ++i);
+    for (int i = util_arg_idx; args[i] != NULL; ++arg_count, ++i);
 
     char** util_args = malloc(sizeof(char*) * (arg_count + 1));
-    util_args[0] = mx_strdup(utils->args[util_arg_idx - 1]);
+    util_args[0] = mx_strdup(args[util_arg_idx - 1]);
     for (int i = 1, j = util_arg_idx; i < arg_count; ++i, ++j) {
 
-        util_args[i] = mx_strdup(utils->args[j]);
+        util_args[i] = mx_strdup(args[j]);
 
     }
     util_args[arg_count] = NULL;
@@ -18,24 +18,24 @@ char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx) {
 
 }
 
-static void handle_new_process(t_cmd_utils* utils, t_env_flags* flags, int* util_arg_idx) {
+static void handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* flags, int* util_arg_idx) {
 
     if (flags->u) {
         if (mx_remove_env_var(&utils, flags->u_param) != 0)
-            mx_process_exit(utils, EXIT_FAILURE);
+            mx_process_exit(utils, args, EXIT_FAILURE);
     }
     if (flags->i)
         mx_env_clear_list(&utils->env_vars);
 
-    mx_set_env_vars(utils, util_arg_idx);
+    mx_set_env_vars(utils, args, util_arg_idx);
 
-    if (utils->args[*util_arg_idx] == NULL)
+    if (args[*util_arg_idx] == NULL)
         mx_print_env_list(utils->env_vars, true);
 
 }
 
 // Execute the env's utility
-void mx_exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
+void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_env_flags* flags) {
 
     pid_t pid = fork();
     int status = 0;
@@ -47,7 +47,7 @@ void mx_exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flag
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        mx_process_exit(utils, EXIT_FAILURE);
+        mx_process_exit(utils, args, EXIT_FAILURE);
     }
     t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == 0) {
@@ -61,28 +61,27 @@ void mx_exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flag
         
         }
 
-        handle_new_process(utils, flags, &util_arg_idx);
+        handle_new_process(utils, args, flags, &util_arg_idx);
         char** env_vars = mx_get_env_array(utils->env_vars);
         mx_env_reset(&utils);
         
-        if (utils->args[util_arg_idx] == NULL) {
+        if (args[util_arg_idx] == NULL) {
             mx_del_strarr(&env_vars);
-            mx_process_exit(utils, EXIT_SUCCESS);
+            mx_process_exit(utils, args, EXIT_SUCCESS);
         }
         
-        char* env_util = mx_strdup(utils->args[util_arg_idx++]);
-        char** util_args = mx_get_env_util_args(utils, util_arg_idx);
+        char* env_util = mx_strdup(args[util_arg_idx++]);
+        char** util_args = mx_get_env_util_args(utils, args, util_arg_idx);
         char** paths = mx_get_exec_paths(env_util, custom_path, true);
         if (execve(paths[0] ? paths[0] : env_util, util_args, env_vars) == -1) {
 
             mx_print_env_error(strerror(errno), env_util);
-            mx_process_exit(utils, MX_EXIT_ENOENT);
+            mx_process_exit(utils, args, MX_EXIT_ENOENT);
 
         }
         mx_strdel(&env_util);
         mx_del_strarr(&env_vars);
         mx_del_strarr(&util_args);
-        // mx_process_exit(utils, EXIT_SUCCESS);
 
     } else {
 

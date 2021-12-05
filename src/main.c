@@ -21,8 +21,6 @@ int main() {
 
     }
 
-    mx_exit(utils);
-
 }
 
 // echo "cd test ; pwd" | ./ush

@@ -47,7 +47,7 @@ typedef struct s_cmd_utils {
     bool is_interactive;
 }              t_cmd_utils;
 
-typedef int (*t_cmd_func)(t_cmd_utils* utils);
+typedef int (*t_cmd_func)(t_cmd_utils* utils, char** args);
 
 
 // COMMANDS' FLAGS
@@ -77,12 +77,12 @@ typedef struct s_pwd_flags {
 
 char** mx_read_line();
 int mx_parse_line(t_cmd_utils *utils, char *line);
-void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils, int* arg_idx);
-int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils, int* arg_idx);
-int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx);
-void mx_echo_parse_flags(t_echo_flags** flags, t_cmd_utils* utils, int *flag_count);
-int mx_parse_for_no_flags(t_cmd_utils* utils, const char* cmd);
-int mx_pwd_parse_flags(t_pwd_flags** flags, t_cmd_utils* utils);
+void mx_cd_parse_flags(t_cd_flags** flags, char** args, int* arg_idx);
+int mx_wch_parse_flags(t_wch_flags** flags, char** args, int* arg_idx);
+int mx_env_parse_flags(t_env_flags** flags, char** args, int* arg_idx);
+void mx_echo_parse_flags(t_echo_flags** flags, char** args, int *flag_count);
+int mx_parse_for_no_flags(char** args, const char* cmd);
+int mx_pwd_parse_flags(t_pwd_flags** flags, char** args);
 void mx_cd_add_flag(t_cd_flags** flags, char flag);
 void mx_wch_add_flag(t_wch_flags** flags, char flag);
 void mx_env_add_flag(t_env_flags** flags, char flag);
@@ -97,16 +97,17 @@ void mx_command_substitution(char **args, t_cmd_utils* utils);
 
 char* mx_cmd_exec(t_cmd_utils* utils, char** args);
 void mx_exec(t_cmd_utils* utils);
-int mx_cd(t_cmd_utils* utils);
-int mx_env(t_cmd_utils* utils);
-int mx_echo(t_cmd_utils* utils);
-int mx_which(t_cmd_utils* utils);
-int mx_pwd(t_cmd_utils* utils);
-int mx_export(t_cmd_utils* utils);
-int mx_unset(t_cmd_utils* utils);
-int mx_fg(t_cmd_utils* utils);
-int mx_exit(t_cmd_utils* utils);
-void mx_cleanup(t_cmd_utils* utils);
+int mx_cd(t_cmd_utils* utils, char** args);
+int mx_env(t_cmd_utils* utils, char** args);
+int mx_echo(t_cmd_utils* utils, char** args);
+int mx_which(t_cmd_utils* utils, char** args);
+int mx_pwd(t_cmd_utils* utils, char** args);
+int mx_export(t_cmd_utils* utils, char** args);
+int mx_unset(t_cmd_utils* utils, char** args);
+int mx_fg(t_cmd_utils* utils, char** args);
+int mx_exit(t_cmd_utils* utils, char** args);
+void mx_cleanup(t_cmd_utils* utils, char** args);
+int mx_builtin_exec(t_cmd_utils* utils, char** args);
 
 // ERROR HANDLING
 
@@ -121,10 +122,10 @@ void mx_print_env_arg_err(char flag);
 // ENV COMMAND UTILS
 
 void mx_env_reset(t_cmd_utils** utils);
-void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx);
+void mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx);
 int mx_remove_env_var(t_cmd_utils** utils, char* name);
-char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
-void mx_exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags);
+char** mx_get_env_util_args(t_cmd_utils* utils, char** args, int util_arg_idx);
+void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_env_flags* flags);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
 
 void mx_export_reset(t_cmd_utils** utils);
@@ -168,7 +169,7 @@ void mx_print_process_list(t_process* list);
 t_process* mx_top_process(t_process* list, int* index);
 t_process* mx_get_process_by_name(t_process* list, const char* name, int* index);
 t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index);
-void mx_process_exit(t_cmd_utils* utils, int exit_code);
+void mx_process_exit(t_cmd_utils* utils, char** args, int exit_code);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
