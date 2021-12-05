@@ -49,11 +49,12 @@ void mx_exec(t_cmd_utils* utils) {
                 mx_printstr("ush: command not found: ");
                 mx_printerr(utils->args[0]);
                 mx_printerr("\n");
+                mx_process_exit(utils, utils->args, MX_EXIT_ENOENT);
             } else {
                 mx_print_cmd_err(utils->args[0], strerror(errno));
                 mx_printerr("\n");
+                mx_process_exit(utils, utils->args, EXIT_FAILURE);
             }
-            mx_process_exit(utils, utils->args, MX_EXIT_ENOENT);
 
         }
         mx_del_strarr(&env_var_array);

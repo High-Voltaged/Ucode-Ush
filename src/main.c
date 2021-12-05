@@ -26,3 +26,6 @@ int main() {
 // echo "cd test ; pwd" | ./ush
 // fix $ in command substitution
 // fix env utils' process management
+
+// u$h> echo $(ls -l inc src)
+// zsh: abort      ./ush

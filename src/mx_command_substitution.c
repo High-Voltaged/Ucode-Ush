@@ -1,5 +1,34 @@
 #include "../inc/ush.h"
 
+// char *mx_del_extra_newlines(const char *str)
+// {
+//     if (str == NULL)
+//     {
+//         return NULL;
+//     }
+    
+//     char *tmp = mx_strtrim(str);
+
+//     int x = 0;
+//     for (int i = 0; tmp[i] != '\0'; i++)
+//     {
+//         if (!mx_isspace(tmp[i]))
+//         {
+//             tmp[x++] = tmp[i];
+//         }
+//         if (tmp[i] == '\n')
+//         {
+//             tmp[x++] = ' ';
+//         }
+//         if ((!mx_isspace(tmp[i])) && tmp[i + 1] == '\n')
+//         {
+//             tmp[x++] = ' ';
+//         }
+//     }
+//     tmp[x] = '\0';
+//     return tmp;
+// }
+
 void mx_command_substitution(char **args, t_cmd_utils* utils)
 {
     int dollar_pos;
@@ -8,7 +37,7 @@ void mx_command_substitution(char **args, t_cmd_utils* utils)
 
     for (int i = 0; args[i] != NULL; i++)
     {
-        if (args[i][0] == '\'')
+        if (args[i][0] == '\'' || mx_strlen(args[i]) <= 1)
         {
             continue;
         }
@@ -38,7 +67,7 @@ void mx_command_substitution(char **args, t_cmd_utils* utils)
                 if (args[i][0] != '\"')
                 {
                     result = mx_replace_substr_free(result, "\n", " ");///////
-                    result = mx_strtrim(result);
+                    // result = mx_strtrim(result);
                     //?????????????
                 }
                 
