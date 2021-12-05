@@ -30,6 +30,8 @@ static int get_param_len(char *str, int dollar_pos)
 
 void mx_param_expansion(char **args)
 {
+    // t_process* last_process = mx_top_process(utils->processes, NULL);
+    // int exit_code = last_process ? last_process->status : 0;
     int dollar_pos;
     int to_replace_len;
     char *to_replace = NULL;

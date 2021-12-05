@@ -102,7 +102,7 @@ int mx_cd(t_cmd_utils* utils, char** args) {
     char* curr_wd = malloc(sizeof(char) * PATH_MAX);
     curr_wd = flags->P ? getcwd(curr_wd, PATH_MAX) : mx_normalize_path(path, dir_str);
     
-    if (/*flags->prev ||*/ is_replaceable) {
+    if (flags->prev || is_replaceable) {
         print_tilde_str(curr_wd);
     }
     setenv(PWD_STR, curr_wd, 1);

@@ -7,7 +7,6 @@ void mx_signals_init(sig_t handler) {
     signal (SIGTSTP, handler);
     signal (SIGTTIN, handler);
     signal (SIGTTOU, handler);
-    signal (SIGCHLD, handler);
 
 }
 
@@ -45,8 +44,7 @@ static void shell_init(t_cmd_utils** utils) {
 
         shell_pgid = getpid();
         if (setpgid (shell_pgid, shell_pgid) < 0) {
-            perror ("Couldn't put the shell in its own process group");
-            exit (1);
+            exit(EXIT_FAILURE);
         }
 
         (*utils)->shell_pgid = shell_pgid;

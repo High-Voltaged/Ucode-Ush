@@ -72,10 +72,7 @@ void mx_exec(t_cmd_utils* utils) {
     else
         mx_foreground_job(utils, chld_process, 0);
 
-    // printf("exit status of %d is %d\n", chld_process->pid, chld_process->status);
-    // if (WIFEXITED(chld_process->status) && WEXITSTATUS(chld_process->status) != 0) {
-    //     printf("popping process, exit status -- %d\n", chld_process->status);
-    //     mx_process_pop_back(&utils->processes);
-    // }
+    if (WIFEXITED(chld_process->status))
+        printf("exit status of %d is %d\n", chld_process->pid, WEXITSTATUS(chld_process->status));
 
 }
