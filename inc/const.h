@@ -2,7 +2,7 @@
 #define CONST_H
 
 #define PATH_MAX 4096
-#define BUFFER_LEN 1024
+#define BUFFER_LEN 10000
 
 // EXIT STATUS CODES
 

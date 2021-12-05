@@ -5,7 +5,7 @@ static char* get_cmd_output(int in_stream) {
     char buffer[BUFFER_LEN];
     int i = 0;
     char ch ;
-    while (read(in_stream, &ch, 1) > 0) {
+    while (read(in_stream, &ch, 1) > 0 && i < BUFFER_LEN - 1) {
         buffer[i++] = ch;
     } 
     buffer[i] = '\0';
@@ -55,9 +55,11 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
                     mx_printerr("ush: command not found: ");
                     mx_printerr(args[0]);
                     mx_printerr("\n");
+                    mx_process_exit(utils, utils->args, MX_EXIT_ENOENT);
                 } else {
                     mx_print_cmd_err(args[0], strerror(errno));
                     mx_printerr("\n");
+                    mx_process_exit(utils, utils->args, EXIT_FAILURE);
                 }
             }
             mx_del_strarr(&env_var_array);

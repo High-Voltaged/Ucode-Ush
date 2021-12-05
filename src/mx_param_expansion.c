@@ -40,7 +40,8 @@ void mx_param_expansion(char **args)
 
     for (int i = 0; args[i] != NULL; i++)
     {
-        if (args[i][0] == '\'')
+
+        if (args[i][0] == '\'' || mx_strlen(args[i]) <= 1)
         {
             continue;
         }
