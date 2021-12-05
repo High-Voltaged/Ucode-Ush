@@ -6,8 +6,6 @@ static char* get_cmd_output(int in_stream) {
     int i = 0;
     char ch ;
     while (read(in_stream, &ch, 1) > 0) {
-        // if (ch == '\n')
-        //     break;
         buffer[i++] = ch;
     } 
     buffer[i] = '\0';
@@ -63,9 +61,9 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
                 }
             }
             mx_del_strarr(&env_var_array);
-            close(my_pipe[1]);
         
         }
+        close(my_pipe[1]);
 
     } else {
 

@@ -76,7 +76,7 @@ typedef struct s_pwd_flags {
 // PARSING
 
 char** mx_read_line();
-int mx_parse_line(t_cmd_utils *utils, char *line);
+int mx_parse_line(t_cmd_utils *utils, char *line, char*** args);
 void mx_cd_parse_flags(t_cd_flags** flags, char** args, int* arg_idx);
 int mx_wch_parse_flags(t_wch_flags** flags, char** args, int* arg_idx);
 int mx_env_parse_flags(t_env_flags** flags, char** args, int* arg_idx);

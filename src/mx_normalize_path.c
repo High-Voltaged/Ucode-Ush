@@ -53,7 +53,8 @@ static char *build_path(char **dir_names)
         mx_strdel(&tmp);    
     }
 
-    !path ? mx_strdup("/") : (void) 0;
+    if (!path)
+        path = mx_strdup("/");
     
     return path;
 }

@@ -4,7 +4,7 @@ int mx_builtin_exec(t_cmd_utils* utils, char** args) {
     
     for (int i = 0; builtin_cmds[i] != NULL; ++i) {
 
-        if (mx_strcmp(utils->args[0], builtin_cmds[i]) == 0) {
+        if (mx_strcmp(args[0], builtin_cmds[i]) == 0) {
             return (builtin_funcs[i])(utils, args);
         }
 
@@ -72,13 +72,10 @@ void mx_exec(t_cmd_utils* utils) {
     else
         mx_foreground_job(utils, chld_process, 0);
 
-//  error processes not getting removed
-
-    if (WIFEXITED(chld_process->status) && WEXITSTATUS(chld_process->status) != 0) {
-        printf("popping process, exit status -- %d\n", chld_process->status);
-        mx_process_pop_back(&utils->processes);
-    }
-
-    // exit(status);
+    // printf("exit status of %d is %d\n", chld_process->pid, chld_process->status);
+    // if (WIFEXITED(chld_process->status) && WEXITSTATUS(chld_process->status) != 0) {
+    //     printf("popping process, exit status -- %d\n", chld_process->status);
+    //     mx_process_pop_back(&utils->processes);
+    // }
 
 }

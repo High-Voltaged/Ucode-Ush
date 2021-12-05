@@ -226,6 +226,5 @@ int mx_echo(t_cmd_utils *utils, char** args)
     }
 
     flags->n ? (void)0 : mx_printstr("\n"); //on linux extra(on Linux it is absent at all) \n if \\c in str
-
     return 0;
 }
