@@ -1,6 +1,6 @@
 #include "../inc/ush.h"
 
-void mx_command_substitution(char **args)
+void mx_command_substitution(char **args, t_cmd_utils* utils)
 {
     // FILE* fd = fopen("test.txt", "w");
     int dollar_pos;
@@ -36,14 +36,15 @@ void mx_command_substitution(char **args)
                 cmd = mx_strndup(&tmp[dollar_pos + 2], mx_get_char_index(&tmp[dollar_pos + 2], ')'));
                 printf("cmd = '%s'\n", cmd);
 
-                //run cmd
+                char** cmd_args = mx_strsplit(cmd, ' ');
+                char* result = mx_cmd_exec(utils, cmd_args);
+
+                printf("result = '%s'\n", result);
                 to_replace = mx_strndup(&tmp[dollar_pos], mx_strlen(cmd) + 3);
                 printf("to_replace = '%s'\n", to_replace);
 
 
-                args[i] = mx_replace_substr_free(args[i], to_replace, "TMP");
-
-                // fprintf(fd, "test here\n");
+                args[i] = mx_replace_substr_free(args[i], to_replace, result);
                 // execvp, mx_run_subshell
                 
                 mx_strdel(&cmd);
@@ -55,5 +56,6 @@ void mx_command_substitution(char **args)
         }
         // mx_strdel(&dup_arg);
     }
-    // fclose(fd);
+    
+    mx_exec(utils);
 }

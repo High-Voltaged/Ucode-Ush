@@ -80,7 +80,7 @@ int mx_env(t_cmd_utils* utils) {
 
         if (utils->args[curr_arg_idx]) {
 
-            exec_env_utility(utils, curr_arg_idx, flags);
+            mx_exec_env_utility(utils, curr_arg_idx, flags);
 
         }
 

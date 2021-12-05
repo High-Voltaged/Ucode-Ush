@@ -247,7 +247,7 @@ int mx_parse_line(t_cmd_utils *utils, char *line)
     if (mx_tilde_expansion(utils->args) != 0)
         return 1;
 
-    mx_command_substitution(utils->args);
+    mx_command_substitution(utils->args, utils);
     del_extra_quotes(utils->args);
 
     return 0;

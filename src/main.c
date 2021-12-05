@@ -14,7 +14,7 @@ int main() {
             if (mx_parse_line(utils, lines[i]) != 0) 
                 continue;
 
-            mx_exec(utils);
+            // mx_exec(utils);
 
         }
         mx_del_strarr(&lines);

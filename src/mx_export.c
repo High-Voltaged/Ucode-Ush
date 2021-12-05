@@ -46,7 +46,7 @@ int mx_unset(t_cmd_utils* utils) {
     for (int idx = 1; utils->args[idx] != NULL; ++idx) {
 
         if (mx_remove_env_var(&utils, utils->args[idx]) != 0) {
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         char* var_name = mx_get_var_name(utils->args[idx - 1]);
         unsetenv(var_name);

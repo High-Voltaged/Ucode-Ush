@@ -16,6 +16,9 @@ static void set_shell_vars() {
     if (!getenv(PWD_STR)) {
         setenv(PWD_STR, getcwd(NULL, 0), 1);
     }
+    if (!getenv(OLDPWD_STR)) {
+        setenv(OLDPWD_STR, getcwd(NULL, 0), 1);
+    }
 
     int shlvl = mx_atoi(getenv("SHLVL"));
     char* shlvl_str = mx_itoa(shlvl + 1);

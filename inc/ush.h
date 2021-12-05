@@ -45,7 +45,6 @@ typedef struct s_cmd_utils {
     struct termios shell_modes;
     int shell_pgid;
     bool is_interactive;
-    // int status;
 }              t_cmd_utils;
 
 typedef int (*t_cmd_func)(t_cmd_utils* utils);
@@ -92,10 +91,11 @@ void mx_pwd_add_flag(t_pwd_flags **flags, char flag);
 char *mx_normalize_path(char *pwd, char *point);
 int mx_tilde_expansion(char **args);
 void mx_param_expansion(char **args);
-void mx_command_substitution(char **args);
+void mx_command_substitution(char **args, t_cmd_utils* utils);
 
 // COMMAND EXECUTION
 
+char* mx_cmd_exec(t_cmd_utils* utils, char** args);
 void mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
@@ -106,6 +106,7 @@ int mx_export(t_cmd_utils* utils);
 int mx_unset(t_cmd_utils* utils);
 int mx_fg(t_cmd_utils* utils);
 int mx_exit(t_cmd_utils* utils);
+void mx_cleanup(t_cmd_utils* utils);
 
 // ERROR HANDLING
 
@@ -123,7 +124,7 @@ void mx_env_reset(t_cmd_utils** utils);
 void mx_set_env_vars(t_cmd_utils* utils, int* arg_idx);
 int mx_remove_env_var(t_cmd_utils** utils, char* name);
 char** mx_get_env_util_args(t_cmd_utils* utils, int util_arg_idx);
-int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags);
+void mx_exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
 
 void mx_export_reset(t_cmd_utils** utils);
@@ -153,8 +154,9 @@ void mx_ush_init(t_cmd_utils** utils);
 
 // PROCESS CONTROL
 
-t_process *mx_create_process(t_cmd_utils* utils);
-void mx_process_push_back(t_process **list, t_cmd_utils* utils);
+t_process *mx_create_process(char** args, const char* path);
+void mx_dfl_push_back(t_process** list, t_process* new_node);
+void mx_process_push_back(t_process **list, t_cmd_utils* utils, const char* path);
 void mx_created_process_push_back(t_process **list, t_process* p);
 void mx_process_pop_front(t_process **head);
 void mx_process_pop_back(t_process **head);
@@ -166,11 +168,11 @@ void mx_print_process_list(t_process* list);
 t_process* mx_top_process(t_process* list, int* index);
 t_process* mx_get_process_by_name(t_process* list, const char* name, int* index);
 t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index);
+void mx_process_exit(t_cmd_utils* utils, int exit_code);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
 void mx_signals_init(sig_t handler);
-
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {

@@ -20,18 +20,18 @@ void mx_exec(t_cmd_utils* utils) {
         return;
     }
 
-    mx_process_push_back(&utils->processes, utils);
+    mx_process_push_back(&utils->processes, utils, NULL);
     // mx_print_process_list(utils->processes);
 
     pid = fork();
 
+    t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        exit(1);
+        mx_process_exit(utils, EXIT_FAILURE);
     }
     
-    t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == 0) {
 
         if (utils->is_interactive) {
@@ -53,12 +53,11 @@ void mx_exec(t_cmd_utils* utils) {
                 mx_print_cmd_err(utils->args[0], strerror(errno));
                 mx_printerr("\n");
             }
-            chld_process->status = 1;
-            exit(1);
+            mx_process_exit(utils, MX_EXIT_ENOENT);
 
         }
         mx_del_strarr(&env_var_array);
-        // exit(0);
+        // mx_process_exit(utils, EXIT_SUCCESS);
 
     } else {
 
