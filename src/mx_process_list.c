@@ -1,10 +1,10 @@
 #include "../inc/ush.h"
 
-t_process *mx_create_process(char** args)
+t_process *mx_create_process(char** args, const char* custom_path)
 {
     t_process *new_node = malloc(sizeof(t_process));
     
-    char** paths = mx_get_exec_paths(args[0], NULL, true);
+    char** paths = mx_get_exec_paths(args[0], custom_path, true);
     new_node->node_id = 0;
     new_node->stopped = new_node->completed = false;
     new_node->path = paths[0] ? mx_strdup(paths[0]) : mx_strdup(args[0]);
@@ -48,9 +48,9 @@ void mx_dfl_push_back(t_process** list, t_process* new_node) {
 
 }
 
-void mx_process_push_back(t_process **list, t_cmd_utils* utils) {
+void mx_process_push_back(t_process **list, t_cmd_utils* utils, const char* custom_path) {
 
-    t_process* new_node = mx_create_process(utils->args);
+    t_process* new_node = mx_create_process(utils->args, custom_path);
     mx_dfl_push_back(list, new_node);
 
 }
@@ -60,6 +60,13 @@ void mx_created_process_push_back(t_process **list, t_process* p) {
     int s_node_id = mx_process_list_size(*list) + 1;
     t_process* new_node = mx_process_dup(p, s_node_id);
     mx_dfl_push_back(list, new_node);
+
+}
+
+void mx_process_exit(t_cmd_utils* utils, int exit_code) {
+
+    mx_cleanup(utils);
+    exit(exit_code);
 
 }
 

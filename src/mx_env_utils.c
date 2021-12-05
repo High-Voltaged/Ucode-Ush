@@ -22,7 +22,7 @@ static void handle_new_process(t_cmd_utils* utils, t_env_flags* flags, int* util
 
     if (flags->u) {
         if (mx_remove_env_var(&utils, flags->u_param) != 0)
-            exit(1);
+            mx_process_exit(utils, EXIT_FAILURE);
     }
     if (flags->i)
         mx_env_clear_list(&utils->env_vars);
@@ -35,26 +35,39 @@ static void handle_new_process(t_cmd_utils* utils, t_env_flags* flags, int* util
 }
 
 // Execute the env's utility
-int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
+void mx_exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
 
     pid_t pid = fork();
     int status = 0;
 
+    char* custom_path = flags->P ? mx_strdup(flags->p_param) : NULL;
+    mx_process_push_back(&utils->processes, utils, custom_path);
+    mx_print_process_list(utils->processes);
+
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        exit(1);
+        mx_process_exit(utils, EXIT_FAILURE);
     }
+    t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == 0) {
         
+        if (utils->is_interactive) {
+            
+            pid_t cpid = getpid();
+            setpgid(cpid, cpid);
+            tcsetpgrp (0, cpid);
+            mx_signals_init(SIG_DFL);
+        
+        }
+
         handle_new_process(utils, flags, &util_arg_idx);
-        char* custom_path = flags->P ? mx_strdup(flags->p_param) : NULL;
         char** env_vars = mx_get_env_array(utils->env_vars);
         mx_env_reset(&utils);
         
         if (utils->args[util_arg_idx] == NULL) {
             mx_del_strarr(&env_vars);
-            exit(0);
+            mx_process_exit(utils, EXIT_SUCCESS);
         }
         
         char* env_util = mx_strdup(utils->args[util_arg_idx++]);
@@ -63,20 +76,27 @@ int exec_env_utility(t_cmd_utils* utils, int util_arg_idx, t_env_flags* flags) {
         if (execve(paths[0] ? paths[0] : env_util, util_args, env_vars) == -1) {
 
             mx_print_env_error(strerror(errno), env_util);
-            exit(1);
+            mx_process_exit(utils, MX_EXIT_ENOENT);
 
         }
         mx_strdel(&env_util);
-        mx_del_strarr(&paths);
         mx_del_strarr(&env_vars);
         mx_del_strarr(&util_args);
-        return 0;
+        // mx_process_exit(utils, EXIT_SUCCESS);
 
+    } else {
+
+        chld_process->pid = pid;
+        if (utils->is_interactive) {
+            setpgid(pid, pid);
+        }
+    
     }
-    waitpid(pid, &status, 0);
-        
-    // wait(&status);
-    return 0;
+
+    if (!utils->is_interactive)
+        mx_wait_for_job(utils, chld_process);
+    else
+        mx_foreground_job(utils, chld_process, 0);
 
 }
 

@@ -62,6 +62,7 @@ int mx_cd(t_cmd_utils* utils) {
     int arg_idx = 1;
     mx_cd_parse_flags(&flags, utils, &arg_idx);
 
+
     char* dir_str = NULL;
     bool is_replaceable = utils->args[arg_idx] && utils->args[arg_idx + 1];
     if (!flags->prev && is_replaceable) {

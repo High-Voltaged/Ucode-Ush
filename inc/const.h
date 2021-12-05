@@ -4,6 +4,10 @@
 #define PATH_MAX 4096
 #define BUFFER_LEN 1024
 
+// EXIT STATUS CODES
+
+#define MX_EXIT_ENOENT     127
+
 static const char* builtin_cmds[] = {
     "cd", "env", "echo", "pwd", "which", 
     "export", "unset", "fg", "exit", NULL

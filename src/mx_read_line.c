@@ -8,7 +8,7 @@ char** mx_read_line() {
     if (getline(&line, &length, stdin) == -1) {
 
         free(line);
-        exit(1);
+        exit(EXIT_FAILURE);
 
     }
     char** separated = mx_strsplit(line, ';');

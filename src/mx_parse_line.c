@@ -184,13 +184,13 @@ static void move_to_space(char *str, int *index, bool *is_finish)
     }
 }
 
-int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst)
+int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
 {
     char *mod_line = mx_strtrim(line);
     if (check_odd_quotes(mod_line) != 0)
         return 1;
 
-    (*dst) = NULL;
+    (*dst_args) = NULL;
 
     char *tmp = mod_line;
     // int space_index = 0;
@@ -201,18 +201,18 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst)
     {
         int index = 0;
 
-        (*dst) = mx_realloc((*dst), (i + 2) * sizeof(char *));
+        (*dst_args) = mx_realloc((*dst_args), (i + 2) * sizeof(char *));
 
         move_to_space(tmp, &index, &is_finish);
 
         if (is_finish)
         {
-            (*dst)[i++] = mx_strndup(mod_line, mx_strlen(mod_line));
+            (*dst_args)[i++] = mx_strndup(mod_line, mx_strlen(mod_line));
         }
         else
         {
             tmp += index;
-            (*dst)[i++] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp));
+            (*dst_args)[i++] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp));
         }
 
         while (mx_isspace(tmp[0]))
@@ -223,16 +223,16 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst)
         mod_line = tmp;
     }
 
-    (*dst)[i] = NULL;
+    (*dst_args)[i] = NULL;
 
-    handle_backslashes((*dst));
-    mx_param_expansion((*dst));  
+    handle_backslashes((*dst_args));
+    mx_param_expansion((*dst_args));  
 
-    if (mx_tilde_expansion((*dst)) != 0)
+    if (mx_tilde_expansion((*dst_args)) != 0)
         return 1;
 
-    mx_command_substitution((*dst), utils);
-    del_extra_quotes((*dst));
+    mx_command_substitution((*dst_args), utils);
+    del_extra_quotes((*dst_args));
 
     return 0;
 }

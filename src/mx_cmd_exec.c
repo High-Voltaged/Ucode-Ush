@@ -6,8 +6,6 @@ static char* get_cmd_output(int in_stream) {
     int i = 0;
     char ch ;
     while (read(in_stream, &ch, 1) > 0) {
-        // if (ch == '\n')
-        //     break;
         buffer[i++] = ch;
     } 
     buffer[i] = '\0';
@@ -23,17 +21,17 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
     if (pipe(my_pipe) < 0) {
         mx_print_cmd_err("pipe", strerror(errno));
         mx_printerr("\n");
-        exit(1);
+        mx_process_exit(utils, EXIT_FAILURE);
     }
 
-    t_process* process = mx_create_process(args);
+    t_process* process = mx_create_process(args, NULL);
     mx_dfl_push_back(&utils->processes, process);
 
     pid_t pid = fork();
     if (pid < 0) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        exit(1);
+        mx_process_exit(utils, EXIT_FAILURE);
     }
     if (pid == 0) {
 
@@ -61,7 +59,7 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
         }
         mx_del_strarr(&env_var_array);
         close(my_pipe[1]);
-        exit(0);
+        mx_process_exit(utils, EXIT_SUCCESS);
 
     } else {
 
