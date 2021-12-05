@@ -1,6 +1,6 @@
 #include "../inc/ush.h"
 
-void mx_command_substitution(char **args)
+void mx_command_substitution(char **args, t_cmd_utils* utils)
 {
     // FILE* fd = fopen("test.txt", "w");
     int dollar_pos;
@@ -29,31 +29,51 @@ void mx_command_substitution(char **args)
             else if (tmp[dollar_pos + 1] == '(')
             {
                 
-                //  echo $(ls $  $(ls $(pwd)))
+                //  echo "$(ls $ dfgd $(ls $(pwd)))"
+                //  echo $(ls -l $(echo test) $(echo test1))
 
                 // int close_parenthesis_idx = mx_get_char_index(&tmp[dollar_pos + 2], ')');
-                printf("tmp = '%s'\n", tmp);
+                // printf("tmp = '%s'\n", tmp);
                 cmd = mx_strndup(&tmp[dollar_pos + 2], mx_get_char_index(&tmp[dollar_pos + 2], ')'));
-                printf("cmd = '%s'\n", cmd);
+                // printf("cmd = '%s'\n", cmd);
 
-                //run cmd
+                // char** cmd_args = mx_strsplit(cmd, ' ');
+                char** cmd_args = NULL;
+                mx_parse_line(utils, cmd, &cmd_args);
+
+                // printf("cmd_args = ");
+                // for (int i = 0; cmd_args[i] != NULL; i++)
+                // {
+                //     printf("'%s', ", cmd_args[i]);
+                // }
+                // printf("\n");
+
+                char* result = mx_cmd_exec(utils, cmd_args);
+
+                if (args[i][0] != '\"')
+                {
+                    result = mx_replace_substr_free(result, "\n", " ");///////
+                    result = mx_strtrim(result);
+                    //?????????????
+                }
+                
+
+                // printf("result = '%s'\n", result);
                 to_replace = mx_strndup(&tmp[dollar_pos], mx_strlen(cmd) + 3);
-                printf("to_replace = '%s'\n", to_replace);
+                // printf("to_replace = '%s'\n", to_replace);
 
 
-                args[i] = mx_replace_substr_free(args[i], to_replace, "TMP");
-
-                // fprintf(fd, "test here\n");
+                args[i] = mx_replace_substr_free(args[i], to_replace, result);
                 // execvp, mx_run_subshell
                 
                 mx_strdel(&cmd);
                 // mx_strdel(&to_replace);
                 tmp = args[i];
             }
-
             // tmp += dollar_pos + 1;
         }
         // mx_strdel(&dup_arg);
     }
-    // fclose(fd);
+    
+    mx_exec(utils);
 }

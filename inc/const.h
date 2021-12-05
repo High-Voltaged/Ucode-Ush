@@ -2,6 +2,7 @@
 #define CONST_H
 
 #define PATH_MAX 4096
+#define BUFFER_LEN 1024
 
 static const char* builtin_cmds[] = {
     "cd", "env", "echo", "pwd", "which", 

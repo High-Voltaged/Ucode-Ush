@@ -77,7 +77,7 @@ typedef struct s_pwd_flags {
 // PARSING
 
 char** mx_read_line();
-int mx_parse_line(t_cmd_utils *utils, char *line);
+int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args);
 void mx_cd_parse_flags(t_cd_flags** flags, t_cmd_utils* utils, int* arg_idx);
 int mx_wch_parse_flags(t_wch_flags** flags, t_cmd_utils* utils, int* arg_idx);
 int mx_env_parse_flags(t_env_flags** flags, t_cmd_utils* utils, int* arg_idx);
@@ -92,10 +92,11 @@ void mx_pwd_add_flag(t_pwd_flags **flags, char flag);
 char *mx_normalize_path(char *pwd, char *point);
 int mx_tilde_expansion(char **args);
 void mx_param_expansion(char **args);
-void mx_command_substitution(char **args);
+void mx_command_substitution(char **args, t_cmd_utils* utils);
 
 // COMMAND EXECUTION
 
+char* mx_cmd_exec(t_cmd_utils* utils, char** args);
 void mx_exec(t_cmd_utils* utils);
 int mx_cd(t_cmd_utils* utils);
 int mx_env(t_cmd_utils* utils);
@@ -153,7 +154,8 @@ void mx_ush_init(t_cmd_utils** utils);
 
 // PROCESS CONTROL
 
-t_process *mx_create_process(t_cmd_utils* utils);
+t_process *mx_create_process(char** args);
+void mx_dfl_push_back(t_process** list, t_process* new_node);
 void mx_process_push_back(t_process **list, t_cmd_utils* utils);
 void mx_created_process_push_back(t_process **list, t_process* p);
 void mx_process_pop_front(t_process **head);
@@ -170,7 +172,6 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
 void mx_signals_init(sig_t handler);
-
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {
