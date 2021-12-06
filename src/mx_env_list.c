@@ -211,13 +211,6 @@ char** mx_get_env_array(t_env_var* list) {
 
 }
 
-// for printing quotes when non-alpha nor digit
-// bool mx_has_extra_symbols(t_env_var* var) {
-
-//    
-
-// }
-
 void mx_print_env_list(t_env_var* list, bool is_env_cmd) {
 
     while (list) {

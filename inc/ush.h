@@ -38,6 +38,9 @@ typedef struct s_env_var {
 }              t_env_var;
 
 typedef struct s_cmd_utils {
+    int ush_pgid;
+    bool is_interactive;
+    int builtin_exit_code;
     char** args;
     char* cmd_line;
     t_env_var* env_vars;
@@ -45,8 +48,6 @@ typedef struct s_cmd_utils {
     t_process* processes;
     struct s_process* stopped_jobs;
     struct termios shell_modes;
-    int shell_pgid;
-    bool is_interactive;
 }              t_cmd_utils;
 
 typedef int (*t_cmd_func)(t_cmd_utils* utils, char** args);
@@ -126,7 +127,7 @@ void mx_print_env_arg_err(char flag);
 // ENV COMMAND UTILS
 
 void mx_env_reset(t_cmd_utils** utils);
-void mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx);
+int mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx);
 int mx_remove_env_var(t_cmd_utils** utils, char* name);
 char** mx_get_env_util_args(t_cmd_utils* utils, char** args, int util_arg_idx);
 void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_env_flags* flags);

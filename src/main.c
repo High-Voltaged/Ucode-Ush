@@ -7,7 +7,9 @@ int main() {
 
     while (1) {
 
-        mx_printstr("u$h> ");
+        if (isatty(0))
+            mx_printstr("u$h> ");
+            
         char** lines = mx_read_line();
         for (int i = 0; lines[i] != NULL; ++i) {
 
@@ -30,10 +32,5 @@ int main() {
 
 }
 
-// echo "cd test ; pwd" | ./ush
-// fix $ in command substitution
 // fix error handling for $(ls), ls $(ls) and alike
-
-// u$h> echo "User here: $(whoami)"
-// Use here: pbalazhy"
 

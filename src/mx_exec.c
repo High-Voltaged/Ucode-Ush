@@ -9,20 +9,22 @@ int mx_builtin_exec(t_cmd_utils* utils, char** args) {
         }
 
     }
-    return 1;
+    return -1;
 
 }
 
 void mx_exec(t_cmd_utils* utils) {
 
-    pid_t pid;
-    if (utils->args[0] == NULL || mx_builtin_exec(utils, utils->args) == 0) {
+    int exit_code;
+    if ((exit_code = mx_builtin_exec(utils, utils->args)) != -1) {
+        utils->builtin_exit_code = exit_code;
+        // printf("exit code -- %d\n", exit_code);
         return;
     }
 
     mx_process_push_back(&utils->processes, utils, NULL);
 
-    pid = fork();
+    pid_t pid = fork();
 
     t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == -1) {

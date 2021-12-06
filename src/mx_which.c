@@ -44,7 +44,7 @@ int mx_which(t_cmd_utils* utils, char** args) {
     t_wch_flags* flags = malloc(sizeof(*flags));
     int arg_idx = 1;
     if (mx_wch_parse_flags(&flags, args, &arg_idx) != 0)
-        return 0;
+        return 1;
 
     for (int i = arg_idx; args[i] != NULL; ++i) {
 
@@ -63,6 +63,8 @@ int mx_which(t_cmd_utils* utils, char** args) {
         if (paths[0] == NULL) {
             mx_printerr(to_find);
             mx_printerr(" not found\n");
+            mx_del_strarr(&paths);
+            return 1;
         } else {
             mx_print_strarr(paths, "\n");
         }

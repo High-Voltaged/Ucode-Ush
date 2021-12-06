@@ -21,13 +21,20 @@ void mx_env_add_flag(t_env_flags** flags, char flag) {
 
 }
 
-void mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx) {
+int mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx) {
 
     for (int i = *arg_idx; args[i] != NULL; ++i) {
 
         char* arg = args[i];
         if (mx_strstr(arg, "=") != NULL) {
             char* var_name = mx_get_var_name(arg);
+            char* var_value = mx_get_var_value(arg);
+            if (mx_strcmp(var_name, "") == 0) {
+                mx_printerr("ush: ");
+                mx_printerr(var_value);
+                mx_printerr(" not found\n");
+                return 1;
+            }
             t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
             
             if (env_var == NULL) {
@@ -36,24 +43,24 @@ void mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx) {
 
             } else {
 
-                char* var_value = mx_get_var_value(arg);
                 mx_overwrite_env_var(&env_var, var_value);
-                mx_strdel(&var_name);
-                mx_strdel(&var_value);
 
             }
+            mx_strdel(&var_name);
+            mx_strdel(&var_value);
 
         } else break;
         ++(*arg_idx);
 
     }
+    return 0;
 
 }
 
 int mx_remove_env_var(t_cmd_utils** utils, char* name) {
 
     if (mx_strchr(name, '=') != NULL) {
-        mx_printerr("env: cannot unset '");
+        mx_printerr("env: cannot unsetenv '");
         mx_printerr(name);
         mx_printerr("': Invalid argument\n");
         return 1;
@@ -74,15 +81,11 @@ int mx_env(t_cmd_utils* utils, char** args) {
     int curr_arg_idx = 1;
     t_env_flags* flags = malloc(sizeof(*flags));
     if (mx_env_parse_flags(&flags, args, &curr_arg_idx) != 0)
-        return 0;
+        return 1;
 
-    if (args[1] != NULL) {
+    if (args[curr_arg_idx]) {
 
-        if (args[curr_arg_idx]) {
-
-            mx_exec_env_utility(utils, args, curr_arg_idx, flags);
-
-        }
+        mx_exec_env_utility(utils, args, curr_arg_idx, flags);
 
     } else {
 

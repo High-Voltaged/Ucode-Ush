@@ -41,8 +41,15 @@ int mx_exit(t_cmd_utils* utils, char** args) {
         handle_custom_exit(utils, args, utils->args[1]);
     }
 
+    int dfl_exit_code = utils->builtin_exit_code;
+    bool builtin_exited = dfl_exit_code != MX_EXIT_NONBUILTIN;
     t_process* p = mx_top_process(utils->processes, NULL);
-    exit_code = p ? WEXITSTATUS(p->status) : EXIT_SUCCESS;
+        // printf("dfl exit code -- %d\n", dfl_exit_code);
+    if (p && !builtin_exited) {
+        exit_code = WEXITSTATUS(p->status);
+    } else if (!builtin_exited) {
+        exit_code = builtin_exited ? dfl_exit_code : EXIT_SUCCESS;
+    }
 
     mx_cleanup(utils, args);
     printf("Exiting...\n");

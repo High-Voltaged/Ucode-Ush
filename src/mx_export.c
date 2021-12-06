@@ -41,7 +41,7 @@ char* mx_get_var_str(t_env_var* env_var) {
 int mx_unset(t_cmd_utils* utils, char** args) {
 
     if (mx_parse_for_no_flags(args, "unset") != 0)
-        return 0;
+        return 1;
 
     for (int idx = 1; args[idx] != NULL; ++idx) {
 
@@ -97,7 +97,7 @@ void mx_export_vars(t_cmd_utils* utils, char** args) {
 int mx_export(t_cmd_utils* utils, char** args) {
 
     if (mx_parse_for_no_flags(args, "export") != 0)
-        return 0;
+        return 1;
 
     if (args[1] != NULL) {
         

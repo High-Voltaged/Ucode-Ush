@@ -18,7 +18,7 @@ char** mx_get_env_util_args(t_cmd_utils* utils, char** args, int util_arg_idx) {
 
 }
 
-static void handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* flags, int* util_arg_idx) {
+static int handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* flags, int* util_arg_idx) {
 
     if (flags->u) {
         if (mx_remove_env_var(&utils, flags->u_param) != 0)
@@ -27,10 +27,13 @@ static void handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* fla
     if (flags->i)
         mx_env_clear_list(&utils->env_vars);
 
-    mx_set_env_vars(utils, args, util_arg_idx);
-
+    if (mx_set_env_vars(utils, args, util_arg_idx) != 0)
+        return 1;
+    
     if (args[*util_arg_idx] == NULL)
         mx_print_env_list(utils->env_vars, true);
+    
+    return 0;
 
 }
 
@@ -60,7 +63,9 @@ void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_en
             mx_signals_init(SIG_DFL);
         }
 
-        handle_new_process(utils, args, flags, &util_arg_idx);
+        if (handle_new_process(utils, args, flags, &util_arg_idx) != 0)
+            exit(EXIT_FAILURE);
+
         char** env_vars = mx_get_env_array(utils->env_vars);
         mx_env_reset(&utils);
         
@@ -83,7 +88,6 @@ void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_en
             } else {
                 exit(EXIT_FAILURE);
             }
-
 
         }
         mx_strdel(&env_util);

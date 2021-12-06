@@ -119,7 +119,7 @@ int mx_env_parse_flags(t_env_flags** flags, char** args, int* arg_idx) {
                         if (arg[j] == 'u') {
 
                             if (args[i + 1] != NULL && j == flag_count - 1) {
-                                (*flags)->u_param = mx_strdup(args[i + 1]);
+                                (*flags)->u_param = mx_strdup(args[++i]);
                                 ++(*arg_idx);
                             } else if (j == flag_count - 1) {
                                 mx_print_env_arg_err(arg[j]);
@@ -129,7 +129,7 @@ int mx_env_parse_flags(t_env_flags** flags, char** args, int* arg_idx) {
                         } else if (arg[j] == 'P') {
 
                             if (args[i + 1] != NULL && j == flag_count - 1) {
-                                (*flags)->p_param = mx_strdup(args[i + 1]);
+                                (*flags)->p_param = mx_strdup(args[++i]);
                                 ++(*arg_idx);
                             } else if (j == flag_count - 1) {
                                 mx_print_env_arg_err(arg[j]);

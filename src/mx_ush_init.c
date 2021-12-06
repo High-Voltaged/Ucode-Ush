@@ -32,28 +32,28 @@ static void set_shell_vars() {
 
 static void shell_init(t_cmd_utils** utils) {
 
-    int sh_tty = STDIN_FILENO;
-    int shell_pgid;
-    bool shell_is_interactive = isatty(sh_tty);
-    if (shell_is_interactive) {
+    int sh_instream = STDIN_FILENO;
+    int ush_pgid;
+    bool is_tty = isatty(sh_instream);
+    if (is_tty) {
         
-        while (tcgetpgrp (sh_tty) != (shell_pgid = getpgrp()))
-            kill (- shell_pgid, SIGTTIN);
+        while (tcgetpgrp(sh_instream) != (ush_pgid = getpgrp()))
+            kill(- ush_pgid, SIGTTIN);
 
         mx_signals_init(SIG_IGN);
 
-        shell_pgid = getpid();
-        if (setpgid (shell_pgid, shell_pgid) < 0) {
+        ush_pgid = getpid();
+        if (setpgid(ush_pgid, ush_pgid) < 0) {
             exit(EXIT_FAILURE);
         }
 
-        (*utils)->shell_pgid = shell_pgid;
-        tcsetpgrp (sh_tty, shell_pgid);
-        tcgetattr (sh_tty, &(*utils)->shell_modes);
+        (*utils)->ush_pgid = ush_pgid;
+        tcsetpgrp(sh_instream, ush_pgid);
+        tcgetattr(sh_instream, &(*utils)->shell_modes);
     
     }
     (*utils)->processes = (*utils)->stopped_jobs = NULL;
-    (*utils)->is_interactive = shell_is_interactive;
+    (*utils)->is_interactive = is_tty;
 
 }
 
@@ -61,12 +61,11 @@ void mx_ush_init(t_cmd_utils** utils) {
 
     shell_init(utils);
 
+    (*utils)->builtin_exit_code = MX_EXIT_NONBUILTIN;
     (*utils)->args = NULL;
     (*utils)->cmd_line = NULL;
     (*utils)->env_vars = NULL;
     (*utils)->exported_vars = NULL;
-    (*utils)->processes = NULL;
-    (*utils)->stopped_jobs = NULL;
     
     set_shell_vars();
     mx_env_reset(utils);

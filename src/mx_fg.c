@@ -28,7 +28,7 @@ int mx_fg(t_cmd_utils* utils, char** args) {
         if (proc_to_fg == NULL) {
             fg_no_job_err(fg_arg);
             mx_strdel(&fg_arg);
-            return 0;
+            return 1;
         }
 
     } else if (mx_strlen(fg_arg) > 0 && fg_arg[0] != '%') {
@@ -37,7 +37,7 @@ int mx_fg(t_cmd_utils* utils, char** args) {
         if (proc_to_fg == NULL) {
             fg_not_found_err(fg_arg);
             mx_strdel(&fg_arg);
-            return 0;
+            return 1;
         }
 
     } else {
@@ -45,7 +45,7 @@ int mx_fg(t_cmd_utils* utils, char** args) {
         proc_to_fg = mx_top_process(utils->stopped_jobs, &proc_idx);
         if (proc_to_fg == NULL) {
             mx_printerr("fg: no current job\n");
-            return 0;
+            return 1;
         }
 
     }

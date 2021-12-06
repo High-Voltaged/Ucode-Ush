@@ -11,6 +11,7 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
                 p->status = status;
                 if (WIFSTOPPED (status)) {
                     p->stopped = true;
+                    utils->builtin_exit_code = MX_EXIT_NONBUILTIN;
                     mx_created_process_push_back(&utils->stopped_jobs, p);
                     mx_printstr("\nush: suspended  ");
                     mx_printstr(p->cmd_line);
@@ -69,7 +70,7 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
     }
 
     mx_wait_for_job(utils, p);
-    if (tcsetpgrp (0, utils->shell_pgid) == -1) {
+    if (tcsetpgrp (0, utils->ush_pgid) == -1) {
         mx_print_cmd_err("tcsetpgrp", strerror(errno));
         mx_printerr("\n");
         exit(EXIT_FAILURE);
