@@ -17,8 +17,10 @@ void mx_exec(t_cmd_utils* utils) {
 
     int exit_code;
     if ((exit_code = mx_builtin_exec(utils, utils->args)) != -1) {
-        utils->builtin_exit_code = exit_code;
-        // printf("exit code -- %d\n", exit_code);
+        
+        if (mx_strcmp(utils->args[0], "env") != 0)
+            utils->builtin_exit_code = exit_code;
+
         return;
     }
 

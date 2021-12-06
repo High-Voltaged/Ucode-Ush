@@ -96,7 +96,7 @@ int mx_cd(t_cmd_utils* utils, char** args) {
         mx_printerr(dir_str);
         mx_printerr("\n");
         mx_strdel(&err_str);
-        return 0;
+        return 1;
     }
 
     char* curr_wd = malloc(sizeof(char) * PATH_MAX);

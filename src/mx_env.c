@@ -80,16 +80,23 @@ int mx_env(t_cmd_utils* utils, char** args) {
 
     int curr_arg_idx = 1;
     t_env_flags* flags = malloc(sizeof(*flags));
-    if (mx_env_parse_flags(&flags, args, &curr_arg_idx) != 0)
+    if (mx_env_parse_flags(&flags, args, &curr_arg_idx) != 0) {
+        utils->builtin_exit_code = 1;
         return 1;
+    }
 
     if (args[curr_arg_idx]) {
 
         mx_exec_env_utility(utils, args, curr_arg_idx, flags);
 
     } else {
-
-        mx_print_env_list(utils->env_vars, true);
+        
+        if (mx_handle_new_process(utils, args, flags, &curr_arg_idx) != 0) {
+            mx_env_reset(&utils);
+            utils->builtin_exit_code = 1;
+            return 1;
+        }
+        mx_env_reset(&utils);
     
     }
     mx_strdel(&flags->p_param);

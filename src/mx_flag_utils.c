@@ -56,6 +56,8 @@ void mx_cd_parse_flags(t_cd_flags** flags, char** args, int* arg_idx) {
 
                 if (is_flag_found(const_flags, arg[j])) {
                     mx_cd_add_flag(flags, arg[j]);
+                } else {
+                    --(*arg_idx);
                 }
             
             }
