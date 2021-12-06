@@ -144,7 +144,7 @@ int mx_env_parse_flags(t_env_flags** flags, char** args, int* arg_idx) {
                         return 1;
                     }
                 }
-            } 
+            } else break;
         } else break;
     }
     return 0;

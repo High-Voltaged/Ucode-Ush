@@ -16,11 +16,13 @@ void mx_wch_add_flag(t_wch_flags** flags, char flag) {
 
 }
 
-char* get_dir_path(char* dir, const char* file_name) {
+char* mx_get_dir_path(char* dir, const char* file_name) {
 
-    char* path = mx_strjoin(dir, "/");
+    char* path = mx_strnew(mx_strlen(dir) + mx_strlen(file_name) + 1);
+    mx_strcat(path, dir);
+    mx_strcat(path, "/");
     mx_strcat(path, file_name);
-    return path;    
+    return path;
 
 }
 

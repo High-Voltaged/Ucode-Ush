@@ -13,7 +13,7 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
                     p->stopped = true;
                     mx_created_process_push_back(&utils->stopped_jobs, p);
                     mx_printstr("\nush: suspended  ");
-                    mx_print_strarr(utils->args, " ");
+                    mx_printstr(p->cmd_line);
                 } else {
                     p->stopped = false;
                     p->completed = true;
@@ -28,7 +28,8 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
         return -1;
     } 
     else {
-        perror("waitpid");
+        mx_print_cmd_err("waitpid", strerror(errno));
+        mx_printerr("\n");
         return -1;
     }
 
@@ -48,20 +49,36 @@ void mx_wait_for_job(t_cmd_utils* utils, t_process* p) {
 
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
 
-    tcsetpgrp(0, p->pid);
+    if (tcsetpgrp(0, p->pid) < 0) {
+        mx_print_cmd_err("tcsetpgrp", strerror(errno));
+        mx_printerr("\n");
+        exit(EXIT_FAILURE);
+    }
 
     if (to_continue) {
 
-        printf("[%d] - continued  %s\n", p->node_id, p->cmd_name);
+        mx_printstr("[");
+        mx_printint(p->node_id);
+        mx_printstr("] - continued  ");
+        mx_printstr(p->cmd_line);
         if (kill(- p->pid, SIGCONT) < 0) {
-            perror("kill (SIGCONT)");
+            mx_print_cmd_err("kill (SIGCONT)", strerror(errno));
+            exit(EXIT_FAILURE);
         }
 
     }
 
     mx_wait_for_job(utils, p);
-    tcsetpgrp (0, utils->shell_pgid);
+    if (tcsetpgrp (0, utils->shell_pgid) < 0) {
+        mx_print_cmd_err("tcsetpgrp", strerror(errno));
+        mx_printerr("\n");
+        exit(EXIT_FAILURE);
+    }
 
-    tcsetattr (0, TCSADRAIN, &utils->shell_modes);
+    if (tcsetattr (0, TCSADRAIN, &utils->shell_modes) < 0) {
+        mx_print_cmd_err("tcsetattr", strerror(errno));
+        mx_printerr("\n");
+        exit(EXIT_FAILURE);
+    }
 
 }

@@ -89,6 +89,8 @@ int mx_env(t_cmd_utils* utils, char** args) {
         mx_print_env_list(utils->env_vars, true);
     
     }
+    mx_strdel(&flags->p_param);
+    mx_strdel(&flags->u_param);
     free(flags);
 
     return 0;

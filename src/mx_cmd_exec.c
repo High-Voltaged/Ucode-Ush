@@ -21,7 +21,7 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
     if (pipe(my_pipe) < 0) {
         mx_print_cmd_err("pipe", strerror(errno));
         mx_printerr("\n");
-        mx_process_exit(utils, args, EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
 
     t_process* process = mx_create_process(args, NULL);
@@ -31,7 +31,7 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
     if (pid < 0) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        mx_process_exit(utils, args, EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
     if (pid == 0) {
 
@@ -55,11 +55,11 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
                     mx_printerr("ush: command not found: ");
                     mx_printerr(args[0]);
                     mx_printerr("\n");
-                    mx_process_exit(utils, utils->args, MX_EXIT_ENOENT);
+                    exit(MX_EXIT_ENOENT);
                 } else {
                     mx_print_cmd_err(args[0], strerror(errno));
                     mx_printerr("\n");
-                    mx_process_exit(utils, utils->args, EXIT_FAILURE);
+                    exit(EXIT_FAILURE);
                 }
             }
             mx_del_strarr(&env_var_array);

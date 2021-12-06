@@ -25,6 +25,7 @@ typedef struct s_process {
     int node_id;
     char* path;
     char* cmd_name;
+    char* cmd_line;
     struct termios sh_modes;
     struct s_process* next;
 }              t_process;
@@ -38,6 +39,7 @@ typedef struct s_env_var {
 
 typedef struct s_cmd_utils {
     char** args;
+    char* cmd_line;
     t_env_var* env_vars;
     t_env_var* exported_vars;
     t_process* processes;
@@ -147,7 +149,7 @@ char** mx_get_env_array(t_env_var* list);
 
 // MISC UTILS
 
-char* get_dir_path(char* dir, const char* file_name);
+char* mx_get_dir_path(char* dir, const char* file_name);
 int mx_util_arg_count(t_cmd_utils* utils);
 char *mx_replace_substr_free(char *str, char *sub, char *replace);
 void mx_ush_init(t_cmd_utils** utils);
@@ -169,7 +171,6 @@ void mx_print_process_list(t_process* list);
 t_process* mx_top_process(t_process* list, int* index);
 t_process* mx_get_process_by_name(t_process* list, const char* name, int* index);
 t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index);
-void mx_process_exit(t_cmd_utils* utils, char** args, int exit_code);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);

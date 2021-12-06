@@ -22,7 +22,7 @@ static void handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* fla
 
     if (flags->u) {
         if (mx_remove_env_var(&utils, flags->u_param) != 0)
-            mx_process_exit(utils, args, EXIT_FAILURE);
+            exit(EXIT_FAILURE);
     }
     if (flags->i)
         mx_env_clear_list(&utils->env_vars);
@@ -37,28 +37,27 @@ static void handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* fla
 // Execute the env's utility
 void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_env_flags* flags) {
 
-    pid_t pid = fork();
     int status = 0;
 
     char* custom_path = flags->P ? mx_strdup(flags->p_param) : NULL;
-    mx_process_push_back(&utils->processes, utils, custom_path);
-    mx_print_process_list(utils->processes);
+    t_process* chld_process = mx_create_process(args, custom_path);
+    chld_process->cmd_line = mx_strdup(utils->cmd_line);
+    mx_dfl_push_back(&utils->processes, chld_process);
+    
+    pid_t pid = fork();
 
     if (pid == -1) {
         mx_print_cmd_err("fork", strerror(errno));
         mx_printerr("\n");
-        mx_process_exit(utils, args, EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
-    t_process* chld_process = mx_top_process(utils->processes, NULL);
     if (pid == 0) {
         
         if (utils->is_interactive) {
-            
             pid_t cpid = getpid();
             setpgid(cpid, cpid);
             tcsetpgrp (0, cpid);
             mx_signals_init(SIG_DFL);
-        
         }
 
         handle_new_process(utils, args, flags, &util_arg_idx);
@@ -67,7 +66,7 @@ void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_en
         
         if (args[util_arg_idx] == NULL) {
             mx_del_strarr(&env_vars);
-            mx_process_exit(utils, args, EXIT_SUCCESS);
+            exit(EXIT_SUCCESS);
         }
         
         char* env_util = mx_strdup(args[util_arg_idx++]);
@@ -75,8 +74,14 @@ void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_en
         char** paths = mx_get_exec_paths(env_util, custom_path, true);
         if (execve(paths[0] ? paths[0] : env_util, util_args, env_vars) == -1) {
 
-            mx_print_env_error(strerror(errno), env_util);
-            mx_process_exit(utils, args, MX_EXIT_ENOENT);
+            int curr_errno = errno;
+            mx_print_env_error(strerror(curr_errno), env_util);
+            if (curr_errno == ENOENT) {
+                exit(MX_EXIT_ENOENT);
+            } else {
+                exit(EXIT_FAILURE);
+            }
+
 
         }
         mx_strdel(&env_util);
@@ -126,11 +131,11 @@ char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool sing
                     if (paths[path_count - 2] != NULL) {
                         paths = mx_realloc(paths, sizeof(*paths) * (++path_count));
                     }
-                    paths[path_count - 2] = get_dir_path(dirs[i], to_find);
+                    paths[path_count - 2] = mx_get_dir_path(dirs[i], to_find);
                     continue;
                 
                 }
-                paths[0] = get_dir_path(dirs[i], to_find);
+                paths[0] = mx_get_dir_path(dirs[i], to_find);
                 is_found = 1;
                 break;
 

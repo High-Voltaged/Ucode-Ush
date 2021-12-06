@@ -23,6 +23,7 @@ t_process *mx_process_dup(t_process* src, int node_id) {
     p_dup->sh_modes = src->sh_modes;
     p_dup->path = mx_strdup(src->path);
     p_dup->cmd_name = mx_strdup(src->cmd_name);
+    p_dup->cmd_line = mx_strdup(src->cmd_line);
     p_dup->stopped = src->stopped;
     p_dup->completed = src->completed;
     p_dup->node_id = node_id;
@@ -51,6 +52,7 @@ void mx_dfl_push_back(t_process** list, t_process* new_node) {
 void mx_process_push_back(t_process **list, t_cmd_utils* utils, const char* custom_path) {
 
     t_process* new_node = mx_create_process(utils->args, custom_path);
+    new_node->cmd_line = mx_strdup(utils->cmd_line);
     mx_dfl_push_back(list, new_node);
 
 }
@@ -59,14 +61,20 @@ void mx_created_process_push_back(t_process **list, t_process* p) {
 
     int s_node_id = mx_process_list_size(*list) + 1;
     t_process* new_node = mx_process_dup(p, s_node_id);
+    p->node_id = s_node_id;
     mx_dfl_push_back(list, new_node);
 
 }
 
-void mx_process_exit(t_cmd_utils* utils, char** args, int exit_code) {
+void mx_clear_process(t_process** p) {
 
-    mx_cleanup(utils, args);
-    exit(exit_code);
+    if (p && *p) {
+        mx_strdel(&(*p)->path);
+        mx_strdel(&(*p)->cmd_name);
+        mx_strdel(&(*p)->cmd_line);
+        free(*p);
+        *p = NULL;
+    }
 
 }
 
@@ -75,23 +83,14 @@ void mx_process_pop_front(t_process **head) {
     if (head == NULL || *head == NULL) return; 
 
     if ((*head)->next == NULL) {
-        free(*head);
+        mx_clear_process(head);
         *head = NULL;
         return;
     }
 
     t_process* temp = *head;
     *head = (*head)->next;
-    free(temp);
-
-}
-
-void mx_clear_process(t_process** p) {
-
-    mx_strdel(&(*p)->path);
-    mx_strdel(&(*p)->cmd_name);
-    free(*p);
-    *p = NULL;
+    mx_clear_process(&temp);
 
 }
 
@@ -137,7 +136,7 @@ void mx_process_pop_index(t_process **list, int index) {
         current = current->next;
     }
     t_process* next = current->next->next;
-    free(current->next);
+    mx_clear_process(&current->next);
     current->next = next;
 
 }

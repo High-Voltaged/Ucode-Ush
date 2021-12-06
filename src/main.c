@@ -11,6 +11,9 @@ int main() {
         char** lines = mx_read_line();
         for (int i = 0; lines[i] != NULL; ++i) {
 
+            mx_strdel(&utils->cmd_line);
+            utils->cmd_line = mx_strdup(lines[i]);
+
             if (mx_parse_line(utils, lines[i], &utils->args) != 0) 
                 continue;
 
@@ -25,8 +28,7 @@ int main() {
 
 // echo "cd test ; pwd" | ./ush
 // fix $ in command substitution
-// fix env utils' process management
-
 
 // u$h> echo "User here: $(whoami)"
 // Use here: pbalazhy"
+
