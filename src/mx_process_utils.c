@@ -11,7 +11,6 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
                 p->status = status;
                 if (WIFSTOPPED (status)) {
                     p->stopped = true;
-                    utils->builtin_exit_code = MX_EXIT_NONBUILTIN;
                     mx_created_process_push_back(&utils->stopped_jobs, p);
                     mx_printstr("\nush: suspended  ");
                     mx_printstr(p->cmd_line);
@@ -46,6 +45,7 @@ void mx_wait_for_job(t_cmd_utils* utils, t_process* p) {
         waitpid(p->pid, &status, WUNTRACED);
         
     }
+    utils->builtin_exit_code = MX_EXIT_NONBUILTIN;
 
 }
 

@@ -27,6 +27,26 @@ static int handle_custom_exit(t_cmd_utils* utils, char** args, const char* exit_
 
 }
 
+int mx_get_last_exit_code(t_cmd_utils* utils) {
+
+    int exit_code = 0;
+    int dfl_exit_code = utils->builtin_exit_code;
+    bool builtin_exited = dfl_exit_code != MX_EXIT_NONBUILTIN;
+    t_process* p = mx_top_process(utils->processes, NULL);
+    
+    if (p && !builtin_exited) {
+
+        exit_code = WEXITSTATUS(p->status);
+    
+    } else if (builtin_exited) {
+        
+        exit_code = builtin_exited ? dfl_exit_code : EXIT_SUCCESS;
+    
+    }
+    return exit_code;
+
+}
+
 int mx_exit(t_cmd_utils* utils, char** args) {
 
     static int warning = 0;
@@ -41,19 +61,7 @@ int mx_exit(t_cmd_utils* utils, char** args) {
         handle_custom_exit(utils, args, utils->args[1]);
     }
 
-    int dfl_exit_code = utils->builtin_exit_code;
-    bool builtin_exited = dfl_exit_code != MX_EXIT_NONBUILTIN;
-    t_process* p = mx_top_process(utils->processes, NULL);
-    
-    if (p && !builtin_exited) {
-        
-        exit_code = WEXITSTATUS(p->status);
-    
-    } else if (builtin_exited) {
-        
-        exit_code = builtin_exited ? dfl_exit_code : EXIT_SUCCESS;
-    
-    }
+    exit_code = mx_get_last_exit_code(utils);
 
     mx_cleanup(utils, args);
     printf("Exiting...\n");

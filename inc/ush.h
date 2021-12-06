@@ -180,6 +180,7 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
 void mx_signals_init(sig_t handler);
+int mx_get_last_exit_code(t_cmd_utils* utils);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {

@@ -43,8 +43,6 @@ static bool is_bad_substitution(char *param)
 
 int mx_param_expansion(t_cmd_utils* utils, char **args)
 {
-    // t_process* last_process = mx_top_process(utils->processes, NULL);
-    // int exit_code = last_process ? last_process->status : 0;
     int dollar_pos;
     int to_replace_len;
     char *to_replace = NULL;
@@ -66,7 +64,12 @@ int mx_param_expansion(t_cmd_utils* utils, char **args)
         {
             if (dollar_pos != -1 && !mx_isspace(tmp[dollar_pos + 1]) && tmp[dollar_pos + 1] != '(' && tmp[dollar_pos + 1] != '\\')
             {
-                if (tmp[dollar_pos + 1] == '{')
+                if (tmp[dollar_pos + 1] == '?') 
+                {
+                    param = mx_strndup(&tmp[dollar_pos], 2);
+                    to_replace_len = 2;
+                }
+                else if (tmp[dollar_pos + 1] == '{')
                 {
                     param = mx_strndup(&tmp[dollar_pos + 2], get_close_extension_brackets_idx(&tmp[dollar_pos], '{', '}') - 2);
                     to_replace_len = mx_strlen(param) + 3;
@@ -83,18 +86,25 @@ int mx_param_expansion(t_cmd_utils* utils, char **args)
                     mx_printerr("ush: bad substitution\n");
                     return -1;
                 }
-                
 
-                env_var = mx_find_env_var(utils->env_vars, param, NULL);
                 to_replace = mx_strndup(&tmp[dollar_pos], to_replace_len);
-
-                if (env_var != NULL)
+                if (tmp[dollar_pos + 1] != '?') 
                 {
-                    args[i] = mx_replace_substr_free(args[i], to_replace, env_var->value);
+                    env_var = mx_find_env_var(utils->env_vars, param, NULL);
+                    if (env_var != NULL)
+                    {
+                        args[i] = mx_replace_substr_free(args[i], to_replace, env_var->value);
+                    }
+                    else
+                    {
+                        args[i] = mx_replace_substr_free(args[i], to_replace, "");
+                    }
                 }
                 else
                 {
-                    args[i] = mx_replace_substr_free(args[i], to_replace, "");
+                    char* exit_code_str = mx_itoa(mx_get_last_exit_code(utils));
+                    args[i] = mx_replace_substr_free(args[i], to_replace, exit_code_str);
+                    mx_strdel(&exit_code_str);
                 }
 
                 mx_strdel(&param);
