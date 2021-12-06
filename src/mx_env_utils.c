@@ -78,6 +78,8 @@ void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_en
             mx_print_env_error(strerror(curr_errno), env_util);
             if (curr_errno == ENOENT) {
                 exit(MX_EXIT_ENOENT);
+            } else if (curr_errno == EACCES) {
+                exit(MX_EXIT_EACCES);
             } else {
                 exit(EXIT_FAILURE);
             }

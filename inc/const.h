@@ -7,6 +7,7 @@
 // EXIT STATUS CODES
 
 #define MX_EXIT_ENOENT     127
+#define MX_EXIT_EACCES     126
 
 static const char* builtin_cmds[] = {
     "cd", "env", "echo", "pwd", "which", 

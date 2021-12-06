@@ -9,7 +9,7 @@ static char* get_cmd_output(int in_stream) {
         buffer[i++] = ch;
     } 
     buffer[i] = '\0';
-    return mx_strdup(buffer);
+    return mx_strndup(buffer, i - 1);
 
 }
 
@@ -25,6 +25,7 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
     }
 
     t_process* process = mx_create_process(args, NULL);
+    process->cmd_line = mx_strdup(utils->cmd_line);
     mx_dfl_push_back(&utils->processes, process);
 
     pid_t pid = fork();
@@ -49,18 +50,11 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
         char** env_var_array = mx_get_env_array(utils->exported_vars);
 
         if (mx_builtin_exec(utils, args) != 0) {
-
+            
             if (execve(process->path, args, env_var_array) < 0) {
-                if (errno == ENOENT) {
-                    mx_printerr("ush: command not found: ");
-                    mx_printerr(args[0]);
-                    mx_printerr("\n");
-                    exit(MX_EXIT_ENOENT);
-                } else {
-                    mx_print_cmd_err(args[0], strerror(errno));
-                    mx_printerr("\n");
-                    exit(EXIT_FAILURE);
-                }
+                
+                mx_ush_err_handling(errno, args[0]);
+                
             }
             mx_del_strarr(&env_var_array);
         
@@ -70,16 +64,19 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
     } else {
 
         close(my_pipe[1]);
-        if (!utils->is_interactive)
-            mx_wait_for_job(utils, process);
-        else
-            mx_foreground_job(utils, process, 0);
-        result = get_cmd_output(my_pipe[0]);
-    
+
         process->pid = pid;
         if (utils->is_interactive) {
             setpgid(pid, pid);
         }
+
+        if (!utils->is_interactive)
+            mx_wait_for_job(utils, process);
+        else
+            mx_foreground_job(utils, process, 0);
+
+        result = get_cmd_output(my_pipe[0]);
+    
         close(my_pipe[0]);
         
     }

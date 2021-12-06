@@ -42,16 +42,7 @@ void mx_exec(t_cmd_utils* utils) {
         char** env_var_array = mx_get_env_array(utils->exported_vars);
         if (execve(chld_process->path, utils->args, env_var_array) == -1) {
             
-            if (errno == ENOENT) {
-                mx_printstr("ush: command not found: ");
-                mx_printerr(utils->args[0]);
-                mx_printerr("\n");
-                exit(MX_EXIT_ENOENT);
-            } else {
-                mx_print_cmd_err(utils->args[0], strerror(errno));
-                mx_printerr("\n");
-                exit(EXIT_FAILURE);
-            }
+            mx_ush_err_handling(errno, utils->args[0]);
 
         }
         mx_del_strarr(&env_var_array);

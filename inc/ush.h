@@ -113,6 +113,7 @@ int mx_builtin_exec(t_cmd_utils* utils, char** args);
 
 // ERROR HANDLING
 
+void mx_ush_err_handling(int error_code, const char* cmd_name);
 void mx_print_odd_quotes_err();
 void mx_print_too_many_args_err(const char* cmd);
 void mx_print_cmd_err(const char* cmd, const char* error);
@@ -153,6 +154,7 @@ char* mx_get_dir_path(char* dir, const char* file_name);
 int mx_util_arg_count(t_cmd_utils* utils);
 char *mx_replace_substr_free(char *str, char *sub, char *replace);
 void mx_ush_init(t_cmd_utils** utils);
+bool mx_is_builtin_cmd(const char* cmd);
 
 
 // PROCESS CONTROL
@@ -174,7 +176,7 @@ t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
-void mx_signals_init(sig_t handler);
+void mx_signals_init(__sighandler_t handler);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {

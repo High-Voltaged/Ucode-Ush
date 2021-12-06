@@ -250,6 +250,8 @@ void mx_print_process_list(t_process* list) {
     while (list) {
 
         mx_printstr(list->path);
+        mx_printstr(" pid -- ");
+        mx_printint(list->pid);
         mx_printstr("\n");
         list = list->next;
 

@@ -6,6 +6,27 @@ static void print_err_char(char flag) {
 
 }
 
+void mx_ush_err_handling(int error_code, const char* cmd_name) {
+
+    switch (error_code) {
+    case ENOENT:
+        mx_printstr("ush: command not found: ");
+        mx_printerr(cmd_name);
+        mx_printerr("\n");
+        exit(MX_EXIT_ENOENT);
+    case EACCES:
+        mx_printerr("ush: permission denied: ");
+        mx_printerr(cmd_name);
+        mx_printerr("\n");
+        exit(MX_EXIT_EACCES);
+    default:
+        mx_print_cmd_err(cmd_name, strerror(errno));
+        mx_printerr("\n");
+        exit(EXIT_FAILURE);
+    }
+
+}
+
 void mx_print_odd_quotes_err() {
 
     mx_printerr("Odd number of quotes.\n");

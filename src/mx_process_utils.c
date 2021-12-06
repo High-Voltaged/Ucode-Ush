@@ -49,7 +49,7 @@ void mx_wait_for_job(t_cmd_utils* utils, t_process* p) {
 
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
 
-    if (tcsetpgrp(0, p->pid) < 0) {
+    if (tcsetpgrp(0, p->pid) == -1) {
         mx_print_cmd_err("tcsetpgrp", strerror(errno));
         mx_printerr("\n");
         exit(EXIT_FAILURE);
@@ -69,7 +69,7 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
     }
 
     mx_wait_for_job(utils, p);
-    if (tcsetpgrp (0, utils->shell_pgid) < 0) {
+    if (tcsetpgrp (0, utils->shell_pgid) == -1) {
         mx_print_cmd_err("tcsetpgrp", strerror(errno));
         mx_printerr("\n");
         exit(EXIT_FAILURE);

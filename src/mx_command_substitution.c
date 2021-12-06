@@ -60,9 +60,14 @@ void mx_command_substitution(char **args, t_cmd_utils* utils)
                 cmd = mx_strndup(&tmp[dollar_pos + 2], mx_get_char_index(&tmp[dollar_pos + 2], ')'));
 
                 char** cmd_args = NULL;
+                char* result = mx_strdup("");
                 mx_parse_line(utils, cmd, &cmd_args);
 
-                char* result = mx_cmd_exec(utils, cmd_args);
+                if (mx_strcmp(cmd_args[0], "") != 0) {
+                    
+                    result = mx_cmd_exec(utils, cmd_args);
+
+                }
 
                 if (args[i][0] != '\"')
                 {

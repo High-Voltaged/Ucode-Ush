@@ -26,7 +26,7 @@ char* mx_get_dir_path(char* dir, const char* file_name) {
 
 }
 
-static bool is_builtin_cmd(const char* cmd) {
+bool mx_is_builtin_cmd(const char* cmd) {
 
     for (int i = 0; builtin_cmds[i] != NULL; ++i) {
 
@@ -49,7 +49,7 @@ int mx_which(t_cmd_utils* utils, char** args) {
     for (int i = arg_idx; args[i] != NULL; ++i) {
 
         char* to_find = args[i];
-        if (is_builtin_cmd(to_find)) {
+        if (mx_is_builtin_cmd(to_find)) {
             mx_printerr(to_find);
             mx_printerr(": shell built-in command\n");
             if (!flags->a) {

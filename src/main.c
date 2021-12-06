@@ -17,7 +17,11 @@ int main() {
             if (mx_parse_line(utils, lines[i], &utils->args) != 0) 
                 continue;
 
-            mx_exec(utils);
+            if (mx_strcmp(utils->args[0], "") != 0) {
+
+                mx_exec(utils);
+
+            }            
 
         }
         mx_del_strarr(&lines);
@@ -28,6 +32,7 @@ int main() {
 
 // echo "cd test ; pwd" | ./ush
 // fix $ in command substitution
+// fix error handling for $(ls), ls $(ls) and alike
 
 // u$h> echo "User here: $(whoami)"
 // Use here: pbalazhy"
