@@ -262,13 +262,13 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
 
     handle_backslashes((*dst_args));
     // mx_param_expansion((*dst_args));
-    if (mx_param_expansion((*dst_args)) != 0)
+    if (mx_param_expansion(utils, (*dst_args)) != 0)
         return 1; 
 
     if (mx_tilde_expansion((*dst_args)) != 0)
         return 1;
 
-    mx_command_substitution((*dst_args), utils);
+    mx_command_substitution(dst_args, utils);
     del_extra_quotes((*dst_args));
 
     return 0;

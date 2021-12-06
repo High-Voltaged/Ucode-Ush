@@ -2,7 +2,7 @@
 
 void mx_del_strarr(char ***arr)
 {
-    if (arr == NULL)
+    if (arr == NULL || *arr == NULL)
     {
         return;
     }

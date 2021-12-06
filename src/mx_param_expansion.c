@@ -41,7 +41,7 @@ static bool is_bad_substitution(char *param)
     return false;
 }
 
-int mx_param_expansion(char **args)
+int mx_param_expansion(t_cmd_utils* utils, char **args)
 {
     // t_process* last_process = mx_top_process(utils->processes, NULL);
     // int exit_code = last_process ? last_process->status : 0;
@@ -49,7 +49,7 @@ int mx_param_expansion(char **args)
     int to_replace_len;
     char *to_replace = NULL;
     char *param = NULL;
-    char *env_var = NULL;
+    t_env_var *env_var = NULL;
 
     for (int i = 0; args[i] != NULL; i++)
     {
@@ -85,12 +85,12 @@ int mx_param_expansion(char **args)
                 }
                 
 
-                env_var = getenv(param);
+                env_var = mx_find_env_var(utils->env_vars, param, NULL);
                 to_replace = mx_strndup(&tmp[dollar_pos], to_replace_len);
 
                 if (env_var != NULL)
                 {
-                    args[i] = mx_replace_substr_free(args[i], to_replace, env_var);
+                    args[i] = mx_replace_substr_free(args[i], to_replace, env_var->value);
                 }
                 else
                 {
@@ -101,7 +101,7 @@ int mx_param_expansion(char **args)
                 mx_strdel(&to_replace);
             }
 
-            tmp += dollar_pos + 1;// if str includes single $ 
+            tmp += dollar_pos + 1; // if str includes single $ 
         }
         mx_strdel(&dup_arg);
     }

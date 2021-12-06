@@ -14,6 +14,7 @@ static int set_process_status(t_cmd_utils* utils, pid_t pid, int status) {
                     mx_created_process_push_back(&utils->stopped_jobs, p);
                     mx_printstr("\nush: suspended  ");
                     mx_printstr(p->cmd_line);
+                    mx_printstr("\n");
                 } else {
                     p->stopped = false;
                     p->completed = true;
@@ -75,7 +76,7 @@ void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue) {
         exit(EXIT_FAILURE);
     }
 
-    if (tcsetattr (0, TCSADRAIN, &utils->shell_modes) < 0) {
+    if (tcsetattr (0, TCSADRAIN, &utils->shell_modes) == -1) {
         mx_print_cmd_err("tcsetattr", strerror(errno));
         mx_printerr("\n");
         exit(EXIT_FAILURE);

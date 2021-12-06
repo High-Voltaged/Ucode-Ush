@@ -1,2 +1,1 @@
-eof entered
-Exit now...
+/bin/ls -- 
