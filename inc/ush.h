@@ -92,8 +92,9 @@ void mx_echo_add_flag(t_echo_flags** flags, char flag);
 void mx_pwd_add_flag(t_pwd_flags **flags, char flag);
 char *mx_normalize_path(char *pwd, char *point);
 int mx_tilde_expansion(char **args);
-void mx_param_expansion(char **args);
+int mx_param_expansion(char **args);
 void mx_command_substitution(char **args, t_cmd_utils* utils);
+int get_close_extension_brackets_idx(char *str, const char opening, const char closing);
 
 // COMMAND EXECUTION
 
@@ -176,7 +177,7 @@ t_process* mx_get_process_by_nodeid(t_process* list, int node_id, int* index);
 void mx_foreground_job(t_cmd_utils* utils, t_process* p, bool to_continue);
 void mx_background_job(t_process* p, bool to_continue);
 void mx_wait_for_job(t_cmd_utils* utils, t_process* p);
-void mx_signals_init(__sighandler_t handler);
+void mx_signals_init(sig_t handler);
 
 // Array of function pointers for commands
 static const t_cmd_func builtin_funcs[] = {

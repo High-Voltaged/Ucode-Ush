@@ -69,7 +69,6 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
         if (utils->is_interactive) {
             setpgid(pid, pid);
         }
-
         if (!utils->is_interactive)
             mx_wait_for_job(utils, process);
         else

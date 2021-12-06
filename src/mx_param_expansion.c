@@ -28,7 +28,20 @@ static int get_param_len(char *str, int dollar_pos)
     return -1;
 }
 
-void mx_param_expansion(char **args)
+static bool is_bad_substitution(char *param)
+{
+    int space_idx = mx_get_char_index(param, ' ');
+    int backslash_idx = mx_get_char_index(param, '\\');
+
+    if (space_idx != -1 || backslash_idx != -1)
+    {
+        return true;
+    }
+    
+    return false;
+}
+
+int mx_param_expansion(char **args)
 {
     // t_process* last_process = mx_top_process(utils->processes, NULL);
     // int exit_code = last_process ? last_process->status : 0;
@@ -55,7 +68,7 @@ void mx_param_expansion(char **args)
             {
                 if (tmp[dollar_pos + 1] == '{')
                 {
-                    param = mx_strndup(&tmp[dollar_pos + 2], mx_get_char_index(&tmp[dollar_pos + 2], '}'));
+                    param = mx_strndup(&tmp[dollar_pos + 2], get_close_extension_brackets_idx(&tmp[dollar_pos], '{', '}') - 2);
                     to_replace_len = mx_strlen(param) + 3;
                 }
                 else
@@ -64,6 +77,13 @@ void mx_param_expansion(char **args)
                     param = (param_len != -1) ? mx_strndup(&tmp[dollar_pos + 1], param_len) : mx_strdup(&tmp[dollar_pos + 1]);
                     to_replace_len = mx_strlen(param) + 1;   
                 }
+
+                if (is_bad_substitution(param))
+                {
+                    mx_printerr("ush: bad substitution\n");
+                    return -1;
+                }
+                
 
                 env_var = getenv(param);
                 to_replace = mx_strndup(&tmp[dollar_pos], to_replace_len);
@@ -85,4 +105,6 @@ void mx_param_expansion(char **args)
         }
         mx_strdel(&dup_arg);
     }
+    
+    return 0;
 }
