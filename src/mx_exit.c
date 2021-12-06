@@ -7,14 +7,25 @@ void mx_cleanup(t_cmd_utils* utils, char** args) {
     mx_clear_process_list(&utils->processes);
     
     char** args_to_clean = args ? args : utils->args;
-    if (args_to_clean) {
-        for (int i = 0; utils->args[i]; ++i) {
-            mx_strdel(&utils->args[i]);
-        }
-        free(utils->args);
+    if (args_to_clean)
+        mx_del_strarr(&args_to_clean);
+
+    mx_strdel(&utils->cmd_line);
+
+}
+
+static int handle_custom_exit(t_cmd_utils* utils, char** args, const char* exit_arg) {
+
+    if (mx_strlen(exit_arg) < 3 && (mx_isdigit(exit_arg[0]) || mx_isdigit(exit_arg[1]))) {
+        int exit_code = mx_atoi(exit_arg);
+        mx_cleanup(utils, args);
+        exit(exit_code);
+    } else {
+        mx_cleanup(utils, args);
+        exit(EXIT_SUCCESS);
     }
 
-} 
+}
 
 int mx_exit(t_cmd_utils* utils, char** args) {
 
@@ -25,13 +36,16 @@ int mx_exit(t_cmd_utils* utils, char** args) {
         return 0;
     }
 
+    unsigned char exit_code = EXIT_SUCCESS;
+    if (utils->args[1]) {
+        handle_custom_exit(utils, args, utils->args[1]);
+    }
+
     t_process* p = mx_top_process(utils->processes, NULL);
-    int exit_code = p ? p->status : EXIT_SUCCESS;
+    exit_code = p ? WEXITSTATUS(p->status) : EXIT_SUCCESS;
 
     mx_cleanup(utils, args);
-
     printf("Exiting...\n");
-    // fflush(stdout);
     exit(exit_code);
-
+    
 }
