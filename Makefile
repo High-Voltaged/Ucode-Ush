@@ -30,7 +30,7 @@ clean:
 	rm -df $(OBJDIR)
 
 uninstall:
-	# make -sC $(LIB_DIR) $@
+	make -sC $(LIB_DIR) $@
 	make clean
 	rm -f $(USH)
 
