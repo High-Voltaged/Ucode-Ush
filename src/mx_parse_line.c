@@ -106,21 +106,46 @@ static void del_extra_quotes(char **args)
     }
 }
 
-int get_close_parenthesis_idx(char *str)
+int get_close_extension_brackets_idx(char *str, const char opening, const char closing)
 {
-    int count_parenthesis = 1;
+    int open_brackets = 0;
 
-    for (int i = 2; str[i] != '\0'; i++)
+    for (int i = 0; str[i] != '\0'; i++)
     {
-        if (str[i] == '$' && str[i + 1] == '(')
+        if (str[i] == '$' && str[i + 1] == opening)
         {
-            count_parenthesis++;
+            open_brackets++;
         }
-        if (str[i] == ')')
+        if (str[i] == closing)
         {
-            count_parenthesis--;
+            open_brackets--;
         }
-        if (count_parenthesis == 0)
+        if (open_brackets == 0)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+static int get_close_quote_idx(char *str, const char quote)
+{
+    bool is_quote_open = false;
+    bool is_open = false;
+
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (!is_quote_open && str[i] == quote && str[i - 1] != '\\')
+        {
+            is_quote_open = true;
+            is_open = true;
+        }
+        else if (is_quote_open && str[i] == quote && str[i - 1] != '\\')
+        {
+            is_quote_open = false;
+        }
+        if (is_open && !is_quote_open)
         {
             return i;
         }
@@ -135,37 +160,44 @@ static void move_to_space(char *str, int *index, bool *is_finish)
     {
         if (str[*index] == '\'')
         {
-            int single_quotes_idx = mx_get_char_index(&str[(*index)], '\'');
-            int backslash_index = mx_get_substr_index(&str[(*index)], "\\\'");
-                // printf("(%d)%d\n",single_quotes_idx, backslash_index);
-            while (single_quotes_idx == backslash_index + 1 && backslash_index != -1)
-            {
-                *index += single_quotes_idx + 1;
-                single_quotes_idx = mx_get_char_index(&str[*index], '\'');
-                backslash_index = mx_get_substr_index(&str[*index], "\\\'");
-            }
-            *index += single_quotes_idx + 1;
-            // *index = mx_get_char_index(&str[(*index) + 1], '\'') + 2;
+            // int single_quotes_idx = mx_get_char_index(&str[(*index)], '\'');
+            // int backslash_index = mx_get_substr_index(&str[(*index)], "\\\'");
+            //     // printf("(%d)%d\n",single_quotes_idx, backslash_index);
+            // while (single_quotes_idx == backslash_index + 1 && backslash_index != -1)
+            // {
+            //     *index += single_quotes_idx + 1;
+            //     single_quotes_idx = mx_get_char_index(&str[*index], '\'');
+            //     backslash_index = mx_get_substr_index(&str[*index], "\\\'");
+            // }
+            // *index += single_quotes_idx + 1;
+
+            *index += get_close_quote_idx(&str[(*index)], '\'') + 1;
             continue;
         }
-        else if (str[*index] == '\"')
+        else if (str[*index] == '\"' && str[(*index) - 1] != '\\')
         {
-            int double_quotes_idx = mx_get_char_index(&str[(*index)], '\"');
-            int backslash_index = mx_get_substr_index(&str[(*index)], "\\\"");
+            // int double_quotes_idx = mx_get_char_index(&str[(*index)], '\"');
+            // int backslash_index = mx_get_substr_index(&str[(*index)], "\\\"");
 
-            while (double_quotes_idx == backslash_index + 1 && backslash_index != -1)
-            {
-                *index += double_quotes_idx + 1;
-                double_quotes_idx = mx_get_char_index(&str[*index], '\"');
-                backslash_index = mx_get_substr_index(&str[*index], "\\\"");
-            }
-            *index += double_quotes_idx + 1;
-            // *index = mx_get_char_index(&str[(*index) + 1], '\"') + 2;
+            // while (double_quotes_idx == backslash_index + 1 && backslash_index != -1)
+            // {
+            //     *index += double_quotes_idx + 1;
+            //     double_quotes_idx = mx_get_char_index(&str[*index], '\"');
+            //     backslash_index = mx_get_substr_index(&str[*index], "\\\"");
+            // }
+            // *index += double_quotes_idx + 1;
+
+            *index += get_close_quote_idx(&str[(*index)], '\"') + 1;
+            continue;
+        }
+        else if (str[*index] == '$' && str[(*index) + 1] == '{')
+        {
+            *index += get_close_extension_brackets_idx(&str[*index], '{', '}');
             continue;
         }
         else if (str[*index] == '$' && str[(*index) + 1] == '(')
         {
-            *index += get_close_parenthesis_idx(&str[*index]);
+            *index += get_close_extension_brackets_idx(&str[*index], '(', ')');
             continue;
         }
         else
@@ -174,7 +206,7 @@ static void move_to_space(char *str, int *index, bool *is_finish)
         }        
     }
 
-    if (str[*index] == '\0')
+    if (str[(*index)] == '\0')
     {
         *is_finish = true;
     }
@@ -214,6 +246,7 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
             tmp += index;
             (*dst_args)[i++] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp));
         }
+        // printf("'%s', ", (*dst_args)[i - 1]);
 
         while (mx_isspace(tmp[0]))
         {
@@ -224,9 +257,13 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
     }
 
     (*dst_args)[i] = NULL;
+                // mx_print_strarr((*dst_args), "--");
+
 
     handle_backslashes((*dst_args));
-    mx_param_expansion((*dst_args));  
+    // mx_param_expansion((*dst_args));
+    if (mx_param_expansion((*dst_args)) != 0)
+        return 1; 
 
     if (mx_tilde_expansion((*dst_args)) != 0)
         return 1;

@@ -1,6 +1,6 @@
 #include "../inc/ush.h"
 
-// char *mx_del_extra_newlines(const char *str)
+// static char *mx_del_extra_newlines(const char *str)
 // {
 //     if (str == NULL)
 //     {
@@ -12,15 +12,11 @@
 //     int x = 0;
 //     for (int i = 0; tmp[i] != '\0'; i++)
 //     {
-//         if (!mx_isspace(tmp[i]))
+//         if (tmp[i] == ' ' || !mx_isspace(tmp[i]))
 //         {
 //             tmp[x++] = tmp[i];
 //         }
-//         if (tmp[i] == '\n')
-//         {
-//             tmp[x++] = ' ';
-//         }
-//         if ((!mx_isspace(tmp[i])) && tmp[i + 1] == '\n')
+//         if (!mx_isspace(tmp[i]) && tmp[i + 1] != ' ' && mx_isspace(tmp[i + 1]))
 //         {
 //             tmp[x++] = ' ';
 //         }
@@ -64,11 +60,13 @@ void mx_command_substitution(char **args, t_cmd_utils* utils)
 
                 char* result = mx_cmd_exec(utils, cmd_args);
 
-                if (args[i][0] != '\"')
+                if (args[i][0] == '\"')
                 {
-                    result = mx_replace_substr_free(result, "\n", " ");///////
-                    // result = mx_strtrim(result);
-                    //?????????????
+                    result = mx_strtrim(result);
+                }
+                else
+                {
+                    result = mx_del_extra_spaces(result);
                 }
                 
                 to_replace = mx_strndup(&tmp[dollar_pos], mx_strlen(cmd) + 3);

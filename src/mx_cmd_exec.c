@@ -70,16 +70,18 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
     } else {
 
         close(my_pipe[1]);
-        if (!utils->is_interactive)
-            mx_wait_for_job(utils, process);
-        else
-            mx_foreground_job(utils, process, 0);
-        result = get_cmd_output(my_pipe[0]);
-    
+
         process->pid = pid;
         if (utils->is_interactive) {
             setpgid(pid, pid);
         }
+        if (!utils->is_interactive)
+            mx_wait_for_job(utils, process);
+        else
+            mx_foreground_job(utils, process, 0);
+
+        result = get_cmd_output(my_pipe[0]);
+    
         close(my_pipe[0]);
         
     }
