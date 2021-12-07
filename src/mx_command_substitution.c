@@ -5,31 +5,48 @@ static void insert_arr_in_elem_of_arr(char ***arr, char **new_elems, int insert_
     int arr_len = 0;
     int new_elems_len = 0;
 
-    while (arr[arr_len] != NULL)
-    {
-        arr_len++;
-    }
-    while (new_elems[new_elems_len] != NULL)
-    {
-        new_elems_len++;
-    }
-    
-    (*arr) = mx_realloc((*arr), sizeof(char*) * (arr_len + new_elems_len));
+    for (; (*arr)[arr_len] != NULL; ++arr_len);
+    for (; new_elems[new_elems_len] != NULL; ++new_elems_len);
 
-    mx_strdel(&(*arr)[insert_idx]);
-    for (int i = insert_idx + 1; (*arr)[i] != NULL; i++)
-    {
-        (*arr)[i + new_elems_len] = mx_strdup((*arr)[i]);
-        mx_strdel(&(*arr)[i]);
+    int res_arr_len = arr_len + new_elems_len + 1;
+
+    char** res_arr = malloc((res_arr_len) * sizeof(**arr));
+    for (int i = 0 ; i < res_arr_len; ++i) {
+        res_arr[i] = NULL;
     }
 
-    for (int i = insert_idx, j = 0; j < new_elems_len; i++, j++)
-    {
-        (*arr)[i] = mx_strdup(new_elems[j]);
+    int idx = 0;
+    for (; idx < insert_idx; ++idx) {
+
+        res_arr[idx] = mx_strdup((*arr)[idx]);
+
     }
-    // arr[arr_len - 1] = "sdfsdf";
-    (*arr)[arr_len + new_elems_len - 1] = NULL;
-    
+    for (int j = 0; j < new_elems_len; ++idx, ++j) {
+
+        res_arr[idx] = mx_strdup(new_elems[j]);
+
+    }
+    for (; idx < arr_len + new_elems_len - 1; ++idx) {
+
+        res_arr[idx] = mx_strdup((*arr)[idx - new_elems_len + 1]);
+
+    }
+    res_arr[idx] = NULL;
+
+    mx_del_strarr(arr);
+
+    *arr = malloc((res_arr_len) * sizeof(**arr));
+    for (int i = 0 ; i < res_arr_len; ++i) {
+        (*arr)[i] = NULL;
+    }
+    for (int i = 0; res_arr[i] != NULL; ++i) {
+
+        (*arr)[i] = mx_strdup(res_arr[i]);
+
+    }
+    (*arr)[arr_len + new_elems_len] = NULL;
+    mx_del_strarr(&res_arr);
+
 }
 
 void mx_command_substitution(char ***args, t_cmd_utils* utils)
@@ -39,7 +56,9 @@ void mx_command_substitution(char ***args, t_cmd_utils* utils)
     char *to_replace = NULL;
     char *cmd = NULL;
 
-    for (int i = 0; (*args)[i] != NULL; i++)
+    char **new_args = NULL;
+    int i = 0;
+    for (; (*args)[i] != NULL; i++)
     {
         if ((*args)[i][0] == '\'' || mx_strlen((*args)[i]) <= 1)
         {
@@ -47,7 +66,7 @@ void mx_command_substitution(char ***args, t_cmd_utils* utils)
         }
 
         char *tmp = (*args)[i];
-        // char **new_args = NULL;
+        char **new_args = NULL;
         
         while ((dollar_pos = mx_get_char_index(tmp, '$')) != -1)
         {
@@ -58,10 +77,6 @@ void mx_command_substitution(char ***args, t_cmd_utils* utils)
             }
             else if (tmp[dollar_pos + 1] == '(')
             {
-                
-                //  echo $(ls $ dfgd $(echo $(pwd)) $(echo test))
-                //  echo $(ls -l $(echo test) $(echo test1))
-
                 cmd = mx_strndup(&tmp[dollar_pos + 2], mx_get_char_index(&tmp[dollar_pos + 2], ')'));
 
                 char** cmd_args = NULL;
@@ -70,6 +85,7 @@ void mx_command_substitution(char ***args, t_cmd_utils* utils)
 
                 if (mx_strcmp(cmd_args[0], "") != 0) {
                     
+                    mx_strdel(&result);
                     result = mx_cmd_exec(utils, cmd_args);
 
                 }
@@ -87,23 +103,21 @@ void mx_command_substitution(char ***args, t_cmd_utils* utils)
 
                 (*args)[i] = mx_replace_substr_free((*args)[i], to_replace, result);
                 
-                // mx_del_strarr(&new_args);
-                // new_args = mx_strsplit(result, ' ');
+                mx_del_strarr(&new_args);
+                new_args = mx_strsplit(result, ' ');
 
                 mx_strdel(&result);
                 mx_strdel(&cmd);
+                mx_strdel(&to_replace);
                 tmp = (*args)[i];
             }
         }
 
-                // printf("HERE\n");
-        // if (new_args != NULL && (*args)[i][0] != '\"')
-        // {
-        //     insert_arr_in_elem_of_arr(args, new_args, i);
-        // }
+        if (new_args != NULL && (*args)[i][0] != '\"')
+        {
+            insert_arr_in_elem_of_arr(args, new_args, i);
+        }
 
-        // mx_print_strarr((*args), "--");
-
-        // mx_del_strarr(&new_args);
+        mx_del_strarr(&new_args);
     }
 }

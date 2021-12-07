@@ -31,6 +31,3 @@ int main() {
     }
 
 }
-
-// fix error handling for $(ls), ls $(ls) and alike
-
