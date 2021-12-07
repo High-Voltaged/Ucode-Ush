@@ -154,39 +154,18 @@ static int get_close_quote_idx(char *str, const char quote)
     return -1;
 }
 
-static void move_to_space(char *str, int *index, bool *is_finish)
+static void move_to_next_elem(char *str, int *index, bool *is_finish)
 {   
     while (str[*index] != '\0' && (!mx_isspace(str[*index]) || (str[(*index) - 1] == '\\' && str[(*index)] == ' ')))
     {
         if (str[*index] == '\'')
         {
-            // int single_quotes_idx = mx_get_char_index(&str[(*index)], '\'');
-            // int backslash_index = mx_get_substr_index(&str[(*index)], "\\\'");
-            //     // printf("(%d)%d\n",single_quotes_idx, backslash_index);
-            // while (single_quotes_idx == backslash_index + 1 && backslash_index != -1)
-            // {
-            //     *index += single_quotes_idx + 1;
-            //     single_quotes_idx = mx_get_char_index(&str[*index], '\'');
-            //     backslash_index = mx_get_substr_index(&str[*index], "\\\'");
-            // }
-            // *index += single_quotes_idx + 1;
 
             *index += get_close_quote_idx(&str[(*index)], '\'') + 1;
             continue;
         }
         else if (str[*index] == '\"' && str[(*index) - 1] != '\\')
         {
-            // int double_quotes_idx = mx_get_char_index(&str[(*index)], '\"');
-            // int backslash_index = mx_get_substr_index(&str[(*index)], "\\\"");
-
-            // while (double_quotes_idx == backslash_index + 1 && backslash_index != -1)
-            // {
-            //     *index += double_quotes_idx + 1;
-            //     double_quotes_idx = mx_get_char_index(&str[*index], '\"');
-            //     backslash_index = mx_get_substr_index(&str[*index], "\\\"");
-            // }
-            // *index += double_quotes_idx + 1;
-
             *index += get_close_quote_idx(&str[(*index)], '\"') + 1;
             continue;
         }
@@ -216,6 +195,28 @@ static void move_to_space(char *str, int *index, bool *is_finish)
     }
 }
 
+static bool is_variable(char *str)
+{
+    if ((mx_isalpha(str[0]) || str[0] == '=') && mx_get_char_index(str, '=') != -1)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+static bool is_variable_valid(char *str)
+{
+    if (str[0] == '=')
+    {
+        mx_printerr(USH_STR);
+        mx_printerr(&str[1]);
+        mx_printerr(" not found\n");
+        return false;
+    }
+    return true;
+}
+
 int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
 {
     char *mod_line = mx_strtrim(line);
@@ -225,9 +226,8 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
     (*dst_args) = NULL;
 
     char *tmp = mod_line;
-    // int space_index = 0;
-    int i = 0;
     bool is_finish = false;
+    int i = 0;
 
     while (!is_finish)
     {
@@ -235,7 +235,7 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
 
         (*dst_args) = mx_realloc((*dst_args), (i + 2) * sizeof(char *));
 
-        move_to_space(tmp, &index, &is_finish);
+        move_to_next_elem(tmp, &index, &is_finish);
 
         if (is_finish)
         {
@@ -246,7 +246,19 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
             tmp += index;
             (*dst_args)[i++] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp));
         }
-        // printf("'%s', ", (*dst_args)[i - 1]);
+
+        if (i - 1 == 0 && is_variable((*dst_args)[i - 1]))
+        {
+            if (!is_variable_valid((*dst_args)[i - 1]))
+                return 1;
+
+            char *new_var = mx_strdup((*dst_args)[i - 1]);
+            //run func
+            mx_strdel(&(*dst_args)[i - 1]);
+
+            i--;
+        }
+        
 
         while (mx_isspace(tmp[0]))
         {
@@ -257,11 +269,8 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
     }
 
     (*dst_args)[i] = NULL;
-                // mx_print_strarr((*dst_args), "--");
-
 
     handle_backslashes((*dst_args));
-    // mx_param_expansion((*dst_args));
     if (mx_param_expansion(utils, (*dst_args)) != 0)
         return 1; 
 
@@ -273,78 +282,3 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
 
     return 0;
 }
-
-// int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst)
-// {
-//     char *mod_line = mx_strtrim(line);
-//     if (check_odd_quotes(mod_line) != 0)
-//         return 1;
-
-//     (*dst) = NULL;
-
-//     char *tmp = mod_line;
-//     int space_index = 0;
-//     int i;
-
-//     for (i = 0; space_index != -1; i++)
-//     {
-//         space_index = mx_get_char_index(tmp, ' ');
-//         int backslash_index = mx_get_substr_index(tmp, "\\ ");
-
-//         while (space_index == backslash_index + 1 && backslash_index != -1)
-//         {
-//             tmp += space_index + 1;
-//             space_index = mx_get_char_index(tmp, ' ');
-//             backslash_index = mx_get_substr_index(tmp, "\\ ");
-//         }
-
-//         (*dst) = mx_realloc((*dst), (i + 2) * sizeof(char *));
-
-//         if (space_index == -1)
-//         {
-//             (*dst)[i] = mx_strndup(mod_line, mx_strlen(mod_line));
-//         }
-//         else if (mod_line[0] == '"')
-//         {
-//             (*dst)[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\"') + 2);
-//             tmp += mx_get_char_index(mod_line + 1, '\"') + 2;
-//         }
-//         else if (mod_line[0] == '\'')
-//         {
-//             (*dst)[i] = mx_strndup(mod_line, mx_get_char_index(mod_line + 1, '\'') + 2);
-//             tmp += mx_get_char_index(mod_line + 1, '\'') + 2;
-//         }
-//         else if (mod_line[0] == '$' && mod_line[1] == '(')
-//         {
-//             int close_parenthesis_idx = get_close_parenthesis_idx(mod_line);
-            
-//             (*dst)[i] = mx_strndup(mod_line, close_parenthesis_idx + 1);
-//             tmp += close_parenthesis_idx + 1;
-//         }
-//         else
-//         {
-//             tmp += space_index + 1;
-//             (*dst)[i] = mx_strndup(mod_line, mx_strlen(mod_line) - mx_strlen(tmp) - 1);
-//         }
-
-//         while (mx_isspace(tmp[0]))
-//         {
-//             tmp++;
-//         }
-
-//         mod_line = tmp;
-//     }
-
-//     (*dst)[i] = NULL;
-
-//     handle_backslashes((*dst));
-//     mx_param_expansion((*dst));  
-
-//     if (mx_tilde_expansion((*dst)) != 0)
-//         return 1;
-
-//     mx_command_substitution((*dst), utils);
-//     del_extra_quotes((*dst));
-
-//     return 0;
-// }
