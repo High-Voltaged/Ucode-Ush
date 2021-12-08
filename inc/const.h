@@ -10,6 +10,14 @@
 #define MX_EXIT_EACCES      126
 #define MX_EXIT_NONBUILTIN  -3
 
+// KEYBOARD 
+
+#define MX_CTRL_C      3
+#define MX_CTRL_D      4
+#define MX_TAB         9
+#define MX_ENTER       10
+#define MX_BACKSPACE   127
+
 static const char* builtin_cmds[] = {
     "cd", "env", "echo", "pwd", "which", 
     "export", "unset", "fg", "exit", NULL
