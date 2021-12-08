@@ -4,6 +4,7 @@ void mx_cleanup(t_cmd_utils* utils, char** args) {
 
     mx_env_clear_list(&utils->env_vars);
     mx_env_clear_list(&utils->exported_vars);
+    mx_env_clear_list(&utils->shell_vars);
     mx_clear_process_list(&utils->processes);
     
     char** args_to_clean = args ? args : utils->args;

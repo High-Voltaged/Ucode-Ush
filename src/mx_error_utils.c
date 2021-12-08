@@ -8,21 +8,26 @@ static void print_err_char(char flag) {
 
 void mx_ush_err_handling(int error_code, const char* cmd_name) {
 
-    switch (error_code) {
-    case ENOENT:
-        mx_printerr("ush: command not found: ");
-        mx_printerr(cmd_name);
+    if (error_code != ENOENT && error_code != EACCES) {
+
+        mx_print_cmd_err(cmd_name, strerror(errno));
         mx_printerr("\n");
-        exit(MX_EXIT_ENOENT);
-    case EACCES:
+        exit(EXIT_FAILURE);
+
+    } else if (mx_strchr(cmd_name, '/') && error_code == EACCES) {
+
         mx_printerr("ush: permission denied: ");
         mx_printerr(cmd_name);
         mx_printerr("\n");
         exit(MX_EXIT_EACCES);
-    default:
-        mx_print_cmd_err(cmd_name, strerror(errno));
+
+    } else {
+
+        mx_printerr("ush: command not found: ");
+        mx_printerr(cmd_name);
         mx_printerr("\n");
-        exit(EXIT_FAILURE);
+        exit(MX_EXIT_ENOENT);
+
     }
 
 }

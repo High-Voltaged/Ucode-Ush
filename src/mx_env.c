@@ -70,7 +70,9 @@ void mx_add_shell_var(t_cmd_utils* utils, char* var_str) {
 
         char* value = mx_get_var_value(var_str);
         t_env_var* exported_var = mx_find_env_var(utils->exported_vars, name, NULL);
+        t_env_var* env_var = mx_find_env_var(utils->env_vars, name, NULL);
         mx_overwrite_env_var(&exported_var, value);
+        mx_overwrite_env_var(&env_var, value);
         mx_overwrite_env_var(&shell_var, value);
         
     }
