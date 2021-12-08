@@ -62,6 +62,7 @@ void mx_export_vars(t_cmd_utils* utils, char** args) {
     for (int i = 1; args[i] != NULL; ++i) {
 
         char* arg = args[i];
+        bool is_to_overwrite = mx_strstr(arg, "=") != NULL;
         char* var_name = mx_get_var_name(arg);
         char* var_value = mx_get_var_value(arg);
         if (mx_strlen(var_name) == 0) {
@@ -72,21 +73,51 @@ void mx_export_vars(t_cmd_utils* utils, char** args) {
             continue;
         }
         t_env_var* exported_var = mx_find_env_var(utils->exported_vars, var_name, NULL);
+        t_env_var* sh_var = mx_find_env_var(utils->shell_vars, var_name, NULL);
         if (exported_var == NULL) {
 
-            mx_env_push_back(&utils->exported_vars, arg);
-            mx_env_push_back(&utils->env_vars, arg);
+            if (sh_var && !is_to_overwrite) {
 
-        } else if (mx_strstr(arg, "=") != NULL) {
+                if (var_value)
+                        setenv(var_name, sh_var->value, 1);
 
-            t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
+                mx_env_dup_push_back(&utils->exported_vars, sh_var);
+                mx_env_dup_push_back(&utils->env_vars, sh_var);
+
+            } else {
+
+                if (sh_var && is_to_overwrite) {
+
+                    if (var_value)
+                        setenv(var_name, sh_var->value, 1);
+                    mx_overwrite_env_var(&sh_var, var_value);
+
+                }
+                if (var_value)
+                        setenv(var_name, var_value, 1);
+                mx_env_push_back(&utils->exported_vars, arg);
+                mx_env_push_back(&utils->env_vars, arg);
+            
+            }
+
+        } else if (is_to_overwrite) {
+
+            mx_overwrite_env_var(&exported_var, var_value);
+            if (sh_var) {
+
+                mx_overwrite_env_var(&sh_var, var_value);
+
+            } else {
+
+                t_env_var* env_var = mx_find_env_var(utils->env_vars, var_name, NULL);
+                mx_overwrite_env_var(&env_var, var_value);
+
+            }
+
             if (var_value)
                 setenv(var_name, var_value, 1);
-            
-            mx_overwrite_env_var(&exported_var, var_value);
-            mx_overwrite_env_var(&env_var, var_value);
         
-        } 
+        }
         mx_strdel(&var_value);
         mx_strdel(&var_name);
         

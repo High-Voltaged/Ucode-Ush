@@ -70,6 +70,7 @@ void mx_ush_init(t_cmd_utils** utils) {
     (*utils)->cmd_line = NULL;
     (*utils)->env_vars = NULL;
     (*utils)->exported_vars = NULL;
+    (*utils)->shell_vars = NULL;
     
     set_shell_vars();
     mx_env_reset(utils);
