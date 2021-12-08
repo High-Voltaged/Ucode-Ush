@@ -56,7 +56,6 @@ void mx_command_substitution(char ***args, t_cmd_utils* utils)
     char *to_replace = NULL;
     char *cmd = NULL;
 
-    char **new_args = NULL;
     int i = 0;
     for (; (*args)[i] != NULL; i++)
     {

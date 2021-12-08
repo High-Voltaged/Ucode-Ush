@@ -131,7 +131,7 @@ void mx_env_reset(t_cmd_utils** utils);
 int mx_handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* flags, int* util_arg_idx);
 int mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx);
 int mx_remove_env_var(t_cmd_utils** utils, char* name);
-char** mx_get_env_util_args(t_cmd_utils* utils, char** args, int util_arg_idx);
+char** mx_get_env_util_args(char** args, int util_arg_idx);
 void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_env_flags* flags);
 char** mx_get_exec_paths(const char* to_find, const char* custom_path, bool single_search);
 

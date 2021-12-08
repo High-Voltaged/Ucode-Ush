@@ -1,7 +1,7 @@
 #include "../inc/ush.h"
 
 // Get arguments for the utility to be executed
-char** mx_get_env_util_args(t_cmd_utils* utils, char** args, int util_arg_idx) {
+char** mx_get_env_util_args(char** args, int util_arg_idx) {
 
     int arg_count = 1;
     for (int i = util_arg_idx; args[i] != NULL; ++arg_count, ++i);
@@ -40,8 +40,6 @@ int mx_handle_new_process(t_cmd_utils* utils, char** args, t_env_flags* flags, i
 // Execute the env's utility
 void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_env_flags* flags) {
 
-    int status = 0;
-
     char* custom_path = flags->P ? mx_strdup(flags->p_param) : NULL;
     t_process* chld_process = mx_create_process(args, custom_path);
     chld_process->cmd_line = mx_strdup(utils->cmd_line);
@@ -75,18 +73,28 @@ void mx_exec_env_utility(t_cmd_utils* utils, char** args, int util_arg_idx, t_en
         }
         
         char* env_util = mx_strdup(args[util_arg_idx++]);
-        char** util_args = mx_get_env_util_args(utils, args, util_arg_idx);
+        char** util_args = mx_get_env_util_args(args, util_arg_idx);
         char** paths = mx_get_exec_paths(env_util, custom_path, true);
         if (execve(paths[0] ? paths[0] : env_util, util_args, env_vars) == -1) {
 
             int curr_errno = errno;
-            mx_print_env_error(strerror(curr_errno), env_util);
-            if (curr_errno == ENOENT) {
-                exit(MX_EXIT_ENOENT);
-            } else if (curr_errno == EACCES) {
-                exit(MX_EXIT_EACCES);
-            } else {
+            if (curr_errno != ENOENT && curr_errno != EACCES) {
+
+                mx_print_env_error(strerror(curr_errno), env_util);
                 exit(EXIT_FAILURE);
+
+            } else if (mx_strchr(env_util, '/') && curr_errno == EACCES) {
+                
+                mx_print_env_error(strerror(curr_errno), env_util);
+                exit(MX_EXIT_EACCES);
+
+            } else {
+
+                mx_printerr("env: ");
+                mx_printerr(env_util);
+                mx_printerr(": No such file or directory\n");
+                exit(MX_EXIT_ENOENT);
+
             }
 
         }

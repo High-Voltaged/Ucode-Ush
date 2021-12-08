@@ -5,11 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <fcntl.h>
-#ifdef __MACH__
-    #include <malloc/malloc.h>
-#else
-    #include <malloc.h>
-#endif
+#include <malloc/malloc.h>
 
 typedef struct s_list
 {

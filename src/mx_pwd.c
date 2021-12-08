@@ -29,7 +29,7 @@ static void print_pwd(char *pwd)
 int mx_pwd(t_cmd_utils* utils, char** args)
 {
     t_pwd_flags *flags = malloc(sizeof(*flags));
-    if (mx_pwd_parse_flags(&flags, args) != 0)
+    if (mx_pwd_parse_flags(&flags, args ? args : utils->args) != 0)
         return 1;
 
     if (flags->L)

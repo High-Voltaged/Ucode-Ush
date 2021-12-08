@@ -69,8 +69,6 @@ static void print_hex(char *str, int *letter_count)
 // bec - backslash escape character
 static void print_bec(char *str, int *letter_count, bool quotes)
 {
-    // wchar_t c = L'\U0001f602';
-
     int bec_pos = quotes ? 0 : 1;
 
     //for out backslashes like in zsh
@@ -217,7 +215,7 @@ int mx_echo(t_cmd_utils *utils, char** args)
 {
     int flag_count = 0;
     t_echo_flags *flags = malloc(sizeof(*flags));
-    mx_echo_parse_flags(&flags, args, &flag_count);
+    mx_echo_parse_flags(&flags, args ? args : utils->args, &flag_count);
 
     for (int i = 1 + flag_count; args[i]; i++)
     {
@@ -225,7 +223,7 @@ int mx_echo(t_cmd_utils *utils, char** args)
         args[i + 1] ? mx_printstr(" ") : (void)0;
     }
 
-    flags->n ? (void)0 : mx_printstr("\n"); //on linux extra(on Linux it is absent at all) \n if \\c in str
+    flags->n ? (void)0 : mx_printstr("\n");
     free(flags);
     return 0;
 }

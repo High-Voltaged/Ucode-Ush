@@ -43,7 +43,7 @@ int mx_which(t_cmd_utils* utils, char** args) {
 
     t_wch_flags* flags = malloc(sizeof(*flags));
     int arg_idx = 1;
-    if (mx_wch_parse_flags(&flags, args, &arg_idx) != 0)
+    if (mx_wch_parse_flags(&flags, args ? args : utils->args, &arg_idx) != 0)
         return 1;
 
     for (int i = arg_idx; args[i] != NULL; ++i) {
