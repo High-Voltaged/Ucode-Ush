@@ -65,7 +65,6 @@ int mx_exit(t_cmd_utils* utils, char** args) {
     exit_code = mx_get_last_exit_code(utils);
 
     mx_cleanup(utils, args);
-    printf("Exiting...\n");
     exit(exit_code);
     
 }

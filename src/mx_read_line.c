@@ -76,6 +76,7 @@ static int handle_keycode(char **line, int *pos, char keycode)
         (*line)[(*pos)++] = keycode;
     }
 
+    fflush(stdin);
     return 0;
 }
 

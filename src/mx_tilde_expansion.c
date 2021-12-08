@@ -19,7 +19,7 @@ int mx_tilde_expansion(char **args)
 
                     if (slash_idx != -1)
                     {
-                        username = mx_strndup(&args[i][tilde_index + 1], slash_idx + 1);
+                        username = mx_strndup(&args[i][tilde_index + 1], slash_idx - 1);
                     }
                     else
                     {
@@ -29,12 +29,19 @@ int mx_tilde_expansion(char **args)
                     if (mx_get_char_index(username, ' ') == -1)
                     {
                         char *path = mx_replace_substr(getenv(HOME_STR), getenv("USER"), username);
+                        char* result = NULL;
+                        if (slash_idx != -1 && mx_strlen(args[i]) > slash_idx) {
 
-                        DIR* dir = opendir(path);
+                            result = mx_strjoin(path, &args[i][slash_idx]);
+                            mx_strdel(&path);
+                        
+                        }
+
+                        DIR* dir = opendir(result);
 
                         if (errno == ENOENT) {
                             mx_printerr("ush: no such user or named directory: ");
-                            mx_printerr(username);
+                            mx_printerr(result);
                             mx_printerr("\n");
 
                             return 1;
@@ -42,7 +49,7 @@ int mx_tilde_expansion(char **args)
                         else 
                         {    
                             mx_strdel(&args[i]);
-                            args[i] = path;
+                            args[i] = result;
                         }
                         closedir(dir);
                     }

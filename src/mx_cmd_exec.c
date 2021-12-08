@@ -49,7 +49,7 @@ char* mx_cmd_exec(t_cmd_utils* utils, char** args) {
         }
         char** env_var_array = mx_get_env_array(utils->exported_vars);
 
-        if (mx_builtin_exec(utils, args) != 0) {
+        if (mx_builtin_exec(utils, args) == -1) {
             
             if (execve(process->path, args, env_var_array) < 0) {
                 
