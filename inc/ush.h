@@ -45,8 +45,9 @@ typedef struct s_cmd_utils {
     char* cmd_line;
     t_env_var* env_vars;
     t_env_var* exported_vars;
+    t_env_var* shell_vars;
     t_process* processes;
-    struct s_process* stopped_jobs;
+    t_process* stopped_jobs;
     struct termios shell_modes;
 }              t_cmd_utils;
 
@@ -138,6 +139,8 @@ void mx_export_reset(t_cmd_utils** utils);
 char* mx_get_var_str(t_env_var* env_var);
 
 t_env_var *mx_create_env_var(char* env_var);
+void mx_env_dup_push_back(t_env_var** list, t_env_var* var);
+void mx_add_shell_var(t_cmd_utils* utils, char* var_str);
 void mx_env_push_back(t_env_var **list, char* env_var);
 void mx_env_pop_index(t_env_var **list, int index);
 void mx_env_clear_list(t_env_var **list);

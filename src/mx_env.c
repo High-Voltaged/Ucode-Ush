@@ -57,6 +57,26 @@ int mx_set_env_vars(t_cmd_utils* utils, char** args, int* arg_idx) {
 
 }
 
+void mx_add_shell_var(t_cmd_utils* utils, char* var_str) {
+
+    char* name = mx_get_var_name(var_str);
+    t_env_var* shell_var = mx_find_env_var(utils->shell_vars, name, NULL);
+    
+    if (shell_var == NULL) {
+
+        mx_env_push_back(&utils->shell_vars, var_str);
+
+    } else if (mx_strstr(var_str, "=") != NULL) {
+
+        char* value = mx_get_var_value(var_str);
+        t_env_var* exported_var = mx_find_env_var(utils->exported_vars, name, NULL);
+        mx_overwrite_env_var(&exported_var, value);
+        mx_overwrite_env_var(&shell_var, value);
+        
+    }
+
+}
+
 int mx_remove_env_var(t_cmd_utils** utils, char* name) {
 
     if (mx_strchr(name, '=') != NULL) {
@@ -68,10 +88,20 @@ int mx_remove_env_var(t_cmd_utils** utils, char* name) {
 
     int env_index = 0;
     int export_index = 0;
-    mx_find_env_var((*utils)->env_vars, name, &env_index);
+    int sh_var_idx = 0;
     mx_find_env_var((*utils)->exported_vars, name, &export_index);
-    mx_env_pop_index(&(*utils)->env_vars, env_index);
     mx_env_pop_index(&(*utils)->exported_vars, export_index);
+
+    if (mx_find_env_var((*utils)->env_vars, name, &env_index) != NULL) {
+
+        mx_env_pop_index(&(*utils)->env_vars, env_index);
+    
+    } else {
+
+        mx_find_env_var((*utils)->shell_vars, name, &sh_var_idx);
+        mx_env_pop_index(&(*utils)->shell_vars, sh_var_idx);
+    
+    }
     return 0;
 
 }

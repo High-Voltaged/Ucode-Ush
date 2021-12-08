@@ -13,10 +13,14 @@ void mx_signals_init(sig_t handler) {
 static void set_shell_vars() {
 
     if (!getenv(PWD_STR)) {
-        setenv(PWD_STR, getcwd(NULL, 0), 1);
+        char* pwd = getcwd(NULL, 0);
+        setenv(PWD_STR, pwd, 1);
+        mx_strdel(&pwd);
     }
     if (!getenv(OLDPWD_STR)) {
-        setenv(OLDPWD_STR, getcwd(NULL, 0), 1);
+        char* oldpwd = getcwd(NULL, 0);
+        setenv(OLDPWD_STR, oldpwd, 1);
+        mx_strdel(&oldpwd);
     }
 
     int shlvl = mx_atoi(getenv("SHLVL"));
@@ -66,6 +70,7 @@ void mx_ush_init(t_cmd_utils** utils) {
     (*utils)->cmd_line = NULL;
     (*utils)->env_vars = NULL;
     (*utils)->exported_vars = NULL;
+    (*utils)->shell_vars = NULL;
     
     set_shell_vars();
     mx_env_reset(utils);

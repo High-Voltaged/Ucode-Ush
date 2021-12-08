@@ -17,9 +17,8 @@ void mx_overwrite_env_var(t_env_var** env_var, const char* value) {
 
 }
 
-void mx_env_push_back(t_env_var **list, char* env_var) {
+static void dfl_env_push_back(t_env_var** list, t_env_var* new_node) {
 
-    t_env_var* new_node = mx_create_env_var(env_var);
     if (list != NULL && *list == NULL) {
         *list = new_node;
         return;
@@ -32,6 +31,22 @@ void mx_env_push_back(t_env_var **list, char* env_var) {
 
     new_node->next = last->next;
     last->next = new_node;
+
+
+}
+
+void mx_env_push_back(t_env_var **list, char* env_var) {
+
+    t_env_var* new_node = mx_create_env_var(env_var);
+    dfl_env_push_back(list, new_node);
+
+}
+
+void mx_env_dup_push_back(t_env_var** list, t_env_var* var) {
+
+    char* var_str = mx_get_var_str(var);
+    t_env_var* new_node = mx_create_env_var(var_str);
+    dfl_env_push_back(list, new_node);
 
 }
 
@@ -73,6 +88,8 @@ void mx_env_pop_front(t_env_var **head) {
 }
 
 void mx_env_pop_index(t_env_var **list, int index) {
+
+    if (index < 0) return;
 
     int size = 0;
     t_env_var* head = *list;

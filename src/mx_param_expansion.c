@@ -90,14 +90,22 @@ int mx_param_expansion(t_cmd_utils* utils, char **args)
                 to_replace = mx_strndup(&tmp[dollar_pos], to_replace_len);
                 if (tmp[dollar_pos + 1] != '?') 
                 {
-                    env_var = mx_find_env_var(utils->env_vars, param, NULL);
+                    env_var = mx_find_env_var(utils->exported_vars, param, NULL);
                     if (env_var != NULL)
                     {
                         args[i] = mx_replace_substr_free(args[i], to_replace, env_var->value);
                     }
                     else
                     {
-                        args[i] = mx_replace_substr_free(args[i], to_replace, "");
+                        env_var = mx_find_env_var(utils->shell_vars, param, NULL);
+                        if (env_var != NULL)
+                        {
+                            args[i] = mx_replace_substr_free(args[i], to_replace, env_var->value);
+                        } 
+                        else 
+                        {    
+                            args[i] = mx_replace_substr_free(args[i], to_replace, "");
+                        }
                     }
                 }
                 else

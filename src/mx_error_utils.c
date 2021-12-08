@@ -10,7 +10,7 @@ void mx_ush_err_handling(int error_code, const char* cmd_name) {
 
     switch (error_code) {
     case ENOENT:
-        mx_printstr("ush: command not found: ");
+        mx_printerr("ush: command not found: ");
         mx_printerr(cmd_name);
         mx_printerr("\n");
         exit(MX_EXIT_ENOENT);

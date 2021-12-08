@@ -19,7 +19,7 @@ int main() {
             if (mx_parse_line(utils, lines[i], &utils->args) != 0) 
                 continue;
 
-            if (mx_strcmp(utils->args[0], "") != 0) {
+            if (utils->args[0] && mx_strcmp(utils->args[0], "") != 0) {
 
                 mx_exec(utils);
 
@@ -31,6 +31,3 @@ int main() {
     }
 
 }
-
-// fix error handling for $(ls), ls $(ls) and alike
-

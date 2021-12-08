@@ -70,6 +70,7 @@ char *mx_replace_substr_free(char *str, char *sub, char *replace)
 
 static void handle_backslashes(char **args)
 {
+
     if (!mx_strcmp(args[0], "echo") || !mx_strcmp(args[0], "\"echo\"") || !mx_strcmp(args[0], "'echo'"))
     {
         return;
@@ -253,7 +254,9 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
                 return 1;
 
             char *new_var = mx_strdup((*dst_args)[i - 1]);
-            //run func
+            
+            mx_add_shell_var(utils, new_var);
+
             mx_strdel(&(*dst_args)[i - 1]);
 
             i--;
@@ -270,15 +273,19 @@ int mx_parse_line(t_cmd_utils *utils, char *line, char ***dst_args)
 
     (*dst_args)[i] = NULL;
 
-    handle_backslashes((*dst_args));
-    if (mx_param_expansion(utils, (*dst_args)) != 0)
-        return 1; 
+    if ((*dst_args)[0] != NULL) {
 
-    if (mx_tilde_expansion((*dst_args)) != 0)
-        return 1;
+        handle_backslashes((*dst_args));
+        if (mx_param_expansion(utils, (*dst_args)) != 0)
+            return 1; 
 
-    mx_command_substitution(dst_args, utils);
-    del_extra_quotes((*dst_args));
+        if (mx_tilde_expansion((*dst_args)) != 0)
+            return 1;
+
+        mx_command_substitution(dst_args, utils);
+        del_extra_quotes((*dst_args));
+
+    }
 
     return 0;
 }
